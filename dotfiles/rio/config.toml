@@ -1,15 +1,48 @@
-# Wesley's Rio config — Catppuccin Mocha
+# Wesley's Rio config - Catppuccin Mocha
 # Rio IS the multiplexer. No tmux/zellij needed.
 # Docs: https://rioterm.com/docs/config
 
-# -----------------------------------------------------------
-# Theme
-# -----------------------------------------------------------
+[developer]
+log-level = "DEBUG"
+enable-log-file = true
+
 theme = "catppuccin-mocha"
 
-# -----------------------------------------------------------
-# Fonts (JetBrainsMono Nerd Font installed via scoop)
-# -----------------------------------------------------------
+[shell]
+program = "wsl.exe"
+args = ["-d", "NixOS", "--", "fish", "-l"]
+
+[window]
+width = 1200
+height = 800
+opacity = 0.92
+blur = true
+decorations = "Transparent"
+padding = [10, 10, 10, 10]
+
+[navigation]
+mode = "Tab"
+hide-if-single = true
+use-split = true
+unfocused-split-opacity = 0.7
+
+[scroll]
+multiplier = 3.0
+divider = 1.0
+
+[cursor]
+shape = "block"
+blinking = false
+blinking-interval = 800
+
+[bell]
+visual = true
+audio = false
+
+[editor]
+program = "code"
+args = []
+
 [fonts]
 size = 12.0
 
@@ -29,71 +62,9 @@ style = "Italic"
 family = "JetBrainsMono Nerd Font"
 style = "Bold Italic"
 
-# -----------------------------------------------------------
-# Shell — spawn fish inside NixOS-WSL
-# -----------------------------------------------------------
-[shell]
-program = "wsl.exe"
-args = ["-d", "NixOS", "--", "fish", "-l"]
-
-# -----------------------------------------------------------
-# Window — glass/blur with Catppuccin Mocha
-# -----------------------------------------------------------
-[window]
-width = 1200
-height = 800
-opacity = 0.92
-blur = true
-decorations = "Transparent"
-padding = [10, 10, 10, 10]
-
-# -----------------------------------------------------------
-# Tabs + Navigation
-# -----------------------------------------------------------
-[navigation]
-mode = "Tab"
-hide-if-single = false
-use-split = true
-unfocused-split-opacity = 0.7
-
-# -----------------------------------------------------------
-# Scrolling
-# -----------------------------------------------------------
-[scroll]
-multiplier = 3.0
-divider = 1.0
-
-# -----------------------------------------------------------
-# Cursor
-# -----------------------------------------------------------
-[cursor]
-shape = "block"
-blinking = false
-blinking-interval = 800
-
-# -----------------------------------------------------------
-# Bell
-# -----------------------------------------------------------
-[bell]
-visual = true
-audio = false
-
-# -----------------------------------------------------------
-# Editor (for OpenConfigEditor key binding)
-# -----------------------------------------------------------
-[editor]
-program = "code"
-args = []
-
-# -----------------------------------------------------------
-# Mouse
-# -----------------------------------------------------------
 hide-mouse-cursor-when-typing = true
 copy-on-select = false
 
-# -----------------------------------------------------------
-# Hints (Ctrl+Shift+O on URLs)
-# -----------------------------------------------------------
 [hints]
 alphabet = "jfkdls;ahgurieowpq"
 
@@ -104,28 +75,15 @@ post-processing = true
 persist = false
 
 [hints.rules.action]
-command = "explorer"
+action = "Copy"
 
 [hints.rules.binding]
 key = "O"
 mods = ["Control", "Shift"]
 
-
-# -----------------------------------------------------------
-# Title
-# -----------------------------------------------------------
 [title]
-content = "{{ PROGRAM }} — {{ RELATIVE_PATH }}"
+content = "{{ PROGRAM }} - {{ RELATIVE_PATH }}"
 
-# -----------------------------------------------------------
-# Behaviour
-# -----------------------------------------------------------
 confirm-before-quit = false
 enable-scroll-bar = true
 scrollback-history-limit = 10000
-
-# -----------------------------------------------------------
-# Platform overrides — Rio on Windows uses NixOS-WSL by default
-# -----------------------------------------------------------
-[platform.windows]
-shell = { program = "wsl.exe", args = ["-d", "NixOS", "--", "fish", "-l"] }
