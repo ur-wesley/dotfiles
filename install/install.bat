@@ -2,11 +2,11 @@
 REM Wesley's dev environment one-shot installer
 REM Double-click or run from cmd/PowerShell. Must be Administrator.
 REM Usage: install.bat [repo-owner/repo] [branch]
-REM   e.g. install.bat wesleycoates/nix-config main
+REM   e.g. install.bat ur-wesley/dotfiles main
 
 setlocal
 set REPO=%~1
-if "%REPO%"=="" set REPO=wesleycoates/nix-config
+if "%REPO%"=="" set REPO=ur-wesley/dotfiles
 set BRANCH=%~2
 if "%BRANCH%"=="" set BRANCH=main
 

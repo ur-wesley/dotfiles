@@ -7,7 +7,7 @@
 
 [CmdletBinding()]
 param(
-    [string]$Repo = "wesleycoates/nix-config",
+    [string]$Repo = "ur-wesley/dotfiles",
     [string]$Branch = "main",
     [string]$NixConfigDir = "$HOME\nix-config"
 )

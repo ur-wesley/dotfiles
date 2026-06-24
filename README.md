@@ -9,7 +9,7 @@ environment on this Windows box.
 
 ```powershell
 # Right-click PowerShell, "Run as Administrator"
-irm https://raw.githubusercontent.com/wesleycoates/nix-config/main/install/install.ps1 -Repo wesleycoates/nix-config | iex
+irm https://raw.githubusercontent.com/ur-wesley/dotfiles/main/install/install.ps1 -Repo ur-wesley/dotfiles | iex
 ```
 
 This installs winget packages, NixOS-WSL, WezTerm, fonts, and clones this
@@ -26,7 +26,7 @@ repo. After the script finishes:
 
 ```powershell
 # From PowerShell (any user, no admin needed)
-irm https://raw.githubusercontent.com/wesleycoates/nix-config/main/install/sync.ps1 | iex
+irm https://raw.githubusercontent.com/ur-wesley/dotfiles/main/install/sync.ps1 | iex
 ```
 
 Or just:
