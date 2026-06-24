@@ -101,9 +101,14 @@
       };
 
       # URL rewrites
+      # The `url` attrset key is the LHS of `[url "..."]`, and the
+      # value is an attrset of sub-keys like `insteadOf` /
+      # `pushInsteadOf`. So this becomes:
+      #   [url "git@github.com:"]
+      #       insteadOf = "https://github.com/"
       url = {
-        insteadOf = {
-          "git@github.com:" = "https://github.com/";
+        "git@github.com:" = {
+          insteadOf = "https://github.com/";
         };
       };
     };
