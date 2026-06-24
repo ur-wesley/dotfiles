@@ -1,0 +1,27 @@
+# Nix build outputs and result symlinks
+result
+result-*
+
+# Local NixOS state
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Secrets — never commit
+*.age
+*.priv
+*.secret
+secrets/
+.env
+.envrc
+
+# Build artifacts
+/tmp-build/
+.cache/
+dist/
+build/
+
+# Local overrides (these can be added later, not part of the public config)
+home/wesley/local.nix
+hosts/nixos-wsl/local.nix
