@@ -3,17 +3,74 @@
 Wesley's NixOS-WSL flake. Single source of truth for the entire dev
 environment on this Windows box.
 
+## Quick start
+
+### On a fresh Windows machine
+
+```powershell
+# Right-click PowerShell, "Run as Administrator"
+irm https://raw.githubusercontent.com/wesleycoates/nix-config/main/install/install.ps1 -Repo wesleycoates/nix-config | iex
+```
+
+This installs winget packages, NixOS-WSL, WezTerm, fonts, and clones this
+repo. After the script finishes:
+
+1. Open **WezTerm** — it drops you into fish inside NixOS-WSL
+2. Inside the WSL shell:
+   ```fish
+   sudo nixos-rebuild switch --flake ~/nix-config#nixos-wsl
+   ```
+3. Done. Same prompt, same tools, same everything.
+
+### Sync latest config onto an existing machine
+
+```powershell
+# From PowerShell (any user, no admin needed)
+irm https://raw.githubusercontent.com/wesleycoates/nix-config/main/install/sync.ps1 | iex
+```
+
+Or just:
+```fish
+# Inside WSL
+cd ~/nix-config
+git pull
+nrs   # alias: nixos-rebuild switch
+```
+
+### WezTerm leader key (C-a)
+
+| Key | Action |
+|---|---|
+| `C-a \|` | Split horizontal |
+| `C-a -` | Split vertical |
+| `C-a h/j/k/l` | Navigate panes |
+| `C-a H/J/K/L` | Resize panes |
+| `C-a z` | Zoom/unzoom pane |
+| `C-a x` | Close pane |
+| `C-a t` | New tab |
+| `C-a n/p` | Next/prev tab |
+| `C-a c` | Close tab |
+| `C-a r` | Rename tab |
+| `C-a 1/2/3` | Switch workspace (Dev / Dev2 / Win) |
+| `C-a r` (SHIFT) | Reload config |
+| `C-a p` (SHIFT) | Command palette |
+| `C-a /` | Search |
+| `C-a f` | Copy mode |
+
 ## What this gives you
 
 - **NixOS 26.05 (Yarara)** running inside WSL2 as the default distro,
-  fully Nix-managed. Replaces the prior `archlinux` WSL distro.
+  fully Nix-managed. Hostname: `Dev`.
 - **`wesley`** is the default user. Passwordless `sudo` via `wheel`.
 - **Home Manager** manages ~everything userland: shell, editor, tools,
   dotfiles, git, gh, etc.
 - **fish** is the default shell (with zsh + bash still available).
-- **Nixvim** as the primary editor (configured opinionated via the
-  flake, with 30+ plugins, full LSP for every language you use).
-- **Opinionated terminal stack**: `fish` + `starship` + `tmux` + `lazygit`
+- **Nixvim** as the primary editor (30+ plugins, full LSP for every
+  language you use).
+- **WezTerm as the multiplexer** — splits, panes, tabs, workspaces,
+  copy mode, all in one app. tmux/zellij are kept as binaries only
+  (no autostart) as a fallback.
+- **Opinionated terminal stack**: `fish` + `starship` + `lazygit`
   + `lazydocker` + `k9s` + `dive` + `yazi` + `btop` + `fzf` + `zoxide`
   + `atuin` + `mcfly` + `direnv` + `nix-direnv` + `gh` + `delta`.
 - **Mise** on the Linux side still owns language runtimes (node, go,
@@ -21,6 +78,8 @@ environment on this Windows box.
   working unchanged.
 - **Docker Desktop** on the Windows side provides the engine; the
   NixOS WSL distro talks to it over the named-pipe bridge.
+- **Portable installer** — run `install/install.ps1` on a fresh Windows
+  box and it bootstraps the same environment end-to-end.
 
 ## Layout
 
@@ -28,13 +87,20 @@ environment on this Windows box.
 nix-config/
 ├── flake.nix                  # inputs + outputs
 ├── flake.lock                 # auto-generated
+├── install/
+│   ├── install.ps1            # one-shot Windows installer (winget + WSL + repo sync)
+│   ├── install.bat            # .bat wrapper for double-click install
+│   └── sync.ps1               # pull latest config + apply on this PC
+├── dotfiles/
+│   ├── wezterm/wezterm.lua    # Windows-side WezTerm config
+│   └── windows-terminal/settings.json   # Windows Terminal profiles
 ├── hosts/nixos-wsl/
 │   └── configuration.nix      # NixOS system config (WSL)
 └── home/wesley/
     ├── core.nix               # starship, fzf, zoxide, direnv, nix-direnv
     ├── fish.nix               # fish shell + aliases + functions + abbrs
     ├── git.nix                # git + delta + gh config
-    ├── terminal.nix           # tmux (sensible/continuum/resurrect/yank)
+    ├── terminal.nix           # TUI tools (tmux/zellij binaries as fallback)
     ├── cli-tools.nix          # eza, bat, ripgrep, fd, jq, yq, btop, yazi
     ├── dev-tools.nix          # docker, k8s, cloud CLIs, build tools
     └── nvim.nix               # Nixvim (full editor config)
