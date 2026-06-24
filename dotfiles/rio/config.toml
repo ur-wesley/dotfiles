@@ -1,0 +1,131 @@
+# Wesley's Rio config — Catppuccin Mocha
+# Rio IS the multiplexer. No tmux/zellij needed.
+# Docs: https://rioterm.com/docs/config
+
+# -----------------------------------------------------------
+# Theme
+# -----------------------------------------------------------
+theme = "catppuccin-mocha"
+
+# -----------------------------------------------------------
+# Fonts (JetBrainsMono Nerd Font installed via scoop)
+# -----------------------------------------------------------
+[fonts]
+size = 12.0
+
+[fonts.regular]
+family = "JetBrainsMono Nerd Font"
+style = "Regular"
+
+[fonts.bold]
+family = "JetBrainsMono Nerd Font"
+style = "Bold"
+
+[fonts.italic]
+family = "JetBrainsMono Nerd Font"
+style = "Italic"
+
+[fonts.bold-italic]
+family = "JetBrainsMono Nerd Font"
+style = "Bold Italic"
+
+# -----------------------------------------------------------
+# Shell — spawn fish inside NixOS-WSL
+# -----------------------------------------------------------
+[shell]
+program = "wsl.exe"
+args = ["-d", "NixOS", "--", "fish", "-l"]
+
+# -----------------------------------------------------------
+# Window — glass/blur with Catppuccin Mocha
+# -----------------------------------------------------------
+[window]
+width = 1200
+height = 800
+opacity = 0.92
+blur = true
+decorations = "Transparent"
+padding = [10, 10, 10, 10]
+
+# -----------------------------------------------------------
+# Tabs + Navigation
+# -----------------------------------------------------------
+[navigation]
+mode = "Tab"
+hide-if-single = false
+use-split = true
+unfocused-split-opacity = 0.7
+
+# -----------------------------------------------------------
+# Scrolling
+# -----------------------------------------------------------
+[scroll]
+multiplier = 3.0
+divider = 1.0
+
+# -----------------------------------------------------------
+# Cursor
+# -----------------------------------------------------------
+[cursor]
+shape = "block"
+blinking = false
+blinking-interval = 800
+
+# -----------------------------------------------------------
+# Bell
+# -----------------------------------------------------------
+[bell]
+visual = true
+audio = false
+
+# -----------------------------------------------------------
+# Editor (for OpenConfigEditor key binding)
+# -----------------------------------------------------------
+[editor]
+program = "code"
+args = []
+
+# -----------------------------------------------------------
+# Mouse
+# -----------------------------------------------------------
+hide-mouse-cursor-when-typing = true
+copy-on-select = false
+
+# -----------------------------------------------------------
+# Hints (Ctrl+Shift+O on URLs)
+# -----------------------------------------------------------
+[hints]
+alphabet = "jfkdls;ahgurieowpq"
+
+[[hints.rules]]
+regex = "(https?://)[^\\s<>\"{}|\\\\^`]+"
+hyperlinks = true
+post-processing = true
+persist = false
+
+[hints.rules.action]
+command = "explorer"
+
+[hints.rules.binding]
+key = "O"
+mods = ["Control", "Shift"]
+
+
+# -----------------------------------------------------------
+# Title
+# -----------------------------------------------------------
+[title]
+content = "{{ PROGRAM }} — {{ RELATIVE_PATH }}"
+
+# -----------------------------------------------------------
+# Behaviour
+# -----------------------------------------------------------
+confirm-before-quit = false
+enable-scroll-bar = true
+scrollback-history-limit = 10000
+
+# -----------------------------------------------------------
+# Platform overrides — Rio on Windows uses NixOS-WSL by default
+# -----------------------------------------------------------
+[platform.windows]
+shell = { program = "wsl.exe", args = ["-d", "NixOS", "--", "fish", "-l"] }
