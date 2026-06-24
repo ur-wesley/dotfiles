@@ -1,4 +1,4 @@
-# Wesley's Rio config - Catppuccin Mocha
+# Wesley's Rio config - Catppuccin Mocha, custom
 # Rio IS the multiplexer. No tmux/zellij needed.
 # Docs: https://rioterm.com/docs/config
 
@@ -6,7 +6,9 @@
 log-level = "DEBUG"
 enable-log-file = true
 
-theme = "catppuccin-mocha"
+# No theme: we set all colors explicitly so we can control the
+# tab bar palette (catppuccin-mocha's bundled theme has no `tabs`
+# entry, so Rio falls back to #cccccc on dark — barely visible).
 
 [shell]
 program = "wsl.exe"
@@ -65,6 +67,38 @@ style = "Bold Italic"
 hide-mouse-cursor-when-typing = true
 copy-on-select = false
 
+# Catppuccin Mocha palette, set explicitly (theme is intentionally
+# omitted above so these win). Tab colors are brightened so the
+# navigation bar reads clearly against the base background.
+[colors]
+background = "#1e1e2e"
+foreground = "#cdd6f4"
+selection-background = "#45475a"
+selection-foreground = "#cdd6f4"
+cursor = "#f5e0dc"
+tabs = "#6c7086"            # inactive tab text — soft, low contrast
+tabs-active = "#cba6f7"      # active tab text — mauve accent
+bar = "#313244"             # tab strip background
+tab-border = "#45475a"      # inactive tab bottom border
+split = "#45475a"           # split divider
+cursor-text = "#1e1e2e"
+black = "#45475a"
+red = "#f38ba8"
+green = "#a6e3a1"
+yellow = "#f9e2af"
+blue = "#89b4fa"
+magenta = "#f5c2e7"
+cyan = "#94e2d5"
+white = "#bac2de"
+light-black = "#585b70"
+light-red = "#f7aec2"
+light-green = "#c2ecbf"
+light-yellow = "#fcd682"
+light-blue = "#aeccfc"
+light-magenta = "#f398da"
+light-cyan = "#b1eae1"
+light-white = "#a6adc8"
+
 [hints]
 alphabet = "jfkdls;ahgurieowpq"
 
@@ -81,8 +115,12 @@ action = "Copy"
 key = "O"
 mods = ["Control", "Shift"]
 
+# Cleaner title: just the home-relative path. The full
+# "fish - ~/nix-config" was getting truncated/wrapped in the
+# tab strip. Drop the program name (it's always fish) and
+# keep just the path.
 [title]
-content = "{{ PROGRAM }} - {{ RELATIVE_PATH }}"
+content = "{{ RELATIVE_PATH }}"
 
 confirm-before-quit = false
 enable-scroll-bar = true
