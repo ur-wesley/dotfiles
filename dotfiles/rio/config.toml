@@ -20,7 +20,16 @@ height = 800
 opacity = 0.92
 blur = true
 decorations = "Transparent"
-padding = [10, 10, 10, 10]
+# Top padding leaves room for the tab strip when 2+ tabs are open.
+# Bottom/sides are 0 so the terminal uses the full window.
+padding = [10, 0, 0, 0]
+
+# No inner panel margin/padding — the terminal content fills the
+# panel. Default values (2px margin, 5px padding) were eating
+# ~14px of vertical space on top of the outer window padding.
+[panel]
+margin = [0]
+padding = [0]
 
 [navigation]
 mode = "Tab"
