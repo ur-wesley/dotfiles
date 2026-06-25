@@ -1,0 +1,8 @@
+[tools]
+bun = "latest"
+luau = "latest"
+node = "latest"
+pitchfork = "latest"
+uv = "latest"
+
+[env]
