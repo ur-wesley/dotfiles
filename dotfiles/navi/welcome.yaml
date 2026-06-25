@@ -8,88 +8,84 @@
 #
 # Format: https://github.com/denisidoro/navi/blob/master/docs/snippet_templates.md
 
-- name: nix-config / rebuild switch (normal)
-  cmd: sudo nixos-rebuild switch --flake ~/nix-config#nixos-wsl
-- name: nix-config / rebuild switch (full refresh)
-  cmd: sudo nixos-rebuild switch --flake ~/nix-config#nixos-wsl --refresh
-- name: nix-config / rebuild test (apply on next boot only)
-  cmd: sudo nixos-rebuild test --flake ~/nix-config#nixos-wsl
-- name: nix-config / rebuild boot (add to bootloader)
-  cmd: sudo nixos-rebuild boot --flake ~/nix-config#nixos-wsl
-- name: nix-config / rollback previous generation
-  cmd: sudo nixos-rebuild --rollback switch
-- name: nix-config / flake update + rebuild both
-  cmd: nix flake update ~/nix-config && sudo nixos-rebuild switch --flake ~/nix-config#nixos-wsl && home-manager switch --flake ~/nix-config#wesley@nixos-wsl
-- name: nix-config / home-manager switch only
-  cmd: home-manager switch --flake ~/nix-config#wesley@nixos-wsl
-- name: nix-config / garbage collect old store paths
-  cmd: nix-collect-garbage -d
-- name: nix-config / search for a package by name
-  cmd: nix search nixpkgs '<query>'
-- name: nix-config / fix sudo setuid (after rebuild, as root)
+- name: nix-config / rebuild + switch (full)
+  cmd: cd ~/nix-config && sudo nixos-rebuild switch --flake '.#nixos-wsl'
+
+- name: nix-config / dry-build only
+  cmd: cd ~/nix-config && sudo nixos-rebuild build --flake '.#nixos-wsl'
+
+- name: nix-config / update flake.lock
+  cmd: cd ~/nix-config && nix flake update
+
+- name: nix-config / fix sudo setuid (WSL workaround)
   cmd: sudo -i; chmod 4755 /nix/store/*-sudo-rs*/bin/sudo
 
 - name: dotfiles / commit grouped by change (conventional)
-  cmd: git add -A && git -c user.email=wesley@ur-wesley.dev -c user.name=wesley commit -m "<type>(<scope>): <subject>"
+  cmd: 'git add -A && git -c user.email=wesley@ur-wesley.dev -c user.name=wesley commit -m "<type>(<scope>): <subject>"'
 - name: dotfiles / sync from repo
-  cmd: cd ~/nix-config && git pull && sudo nixos-rebuild switch --flake .#nixos-wsl
+  cmd: cd ~/nix-config && git pull && sudo nixos-rebuild switch --flake '.#nixos-wsl'
 
 - name: fish / zoxide jump
   cmd: z <pattern>
 - name: fish / zoxide interactive picker
   cmd: zi
-- name: fish / reload fish config
-  cmd: source ~/.config/fish/config.fish
 
-- name: mise / install latest of every tool
-  cmd: mise install --latest
-- name: mise / show current tool versions
+- name: mise / list installed runtimes
+  cmd: mise list
+- name: mise / install latest of a runtime
+  cmd: mise use --global <runtime>@latest
+- name: mise / current runtime versions
   cmd: mise current
-- name: mise / list available versions of a tool
-  cmd: mise ls-remote <tool>
 
-- name: docker / nuke all containers + volumes
-  cmd: docker stop $(docker ps -aq); docker system prune --volumes -f
-- name: docker / show container resource usage (live)
-  cmd: docker stats
-- name: docker / shell into running container (by name pattern)
-  cmd: docker exec -it $(docker ps -qf 'name=<pattern>') sh
-- name: docker compose / restart a single service
-  cmd: docker compose restart <service>
-- name: docker compose / tail logs of a service
-  cmd: docker compose logs -f <service>
+- name: docker / nuke all stopped containers + dangling images
+  cmd: docker system prune -af
+- name: docker / shell into running container
+  cmd: docker exec -it <container> /bin/bash
 
-- name: kubectl / get all pods across all namespaces
-  cmd: kubectl get pods -A
-- name: kubectl / describe a stuck pod
-  cmd: kubectl describe pod <pod> -n <namespace>
-- name: kubectl / exec into a pod
-  cmd: kubectl exec -it <pod> -n <namespace> -- sh
+- name: kubectl / context list
+  cmd: kubectl config get-contexts
+- name: kubectl / switch context
+  cmd: kubectx <context>
 - name: kubectl / tail logs of a pod
-  cmd: kubectl logs -f <pod> -n <namespace>
-- name: kubectl / switch namespace (kubens)
-  cmd: kns <namespace>
-- name: kubectl / switch context (kubectx)
-  cmd: kctx <context>
-- name: kubectl / show events sorted by timestamp
-  cmd: kubectl get events --sort-by=.metadata.creationTimestamp
+  cmd: stern <pod-prefix>
 
-- name: git / undo last commit (keep changes staged)
+- name: git / undo last commit (keep changes)
   cmd: git reset --soft HEAD~1
-- name: git / undo last commit (discard changes)
+- name: git / undo last commit (drop changes)
   cmd: git reset --hard HEAD~1
-- name: git / delete merged local branches
-  cmd: git branch --merged | grep -v '^\*' | xargs -n 1 git branch -d
-- name: git / delete merged remote branches
-  cmd: git branch -r --merged | grep -v 'main\|master' | sed 's/origin\///' | xargs -I {} git push origin :{}
-- name: git / show file at a specific commit
-  cmd: git show <commit>:<file>
-- name: git / find commit that introduced a bug with bisect
-  cmd: git bisect start; git bisect bad HEAD; git bisect good <commit>; <test>; git bisect good|bad
+- name: git / drop uncommitted changes
+  cmd: git checkout -- .
+- name: git / drop untracked files
+  cmd: git clean -fd
+- name: git / amend last commit
+  cmd: git commit --amend --no-edit
+- name: git / interactive rebase last N commits
+  cmd: git rebase -i HEAD~<n>
 
-- name: system / disk usage by directory (top 20)
-  cmd: dust -d 2 -r /
-- name: system / top processes by memory
-  cmd: procs --sort rss
-- name: system / listening ports
+- name: system / show disk usage by directory
+  cmd: dust
+- name: system / show processes sorted by cpu
+  cmd: procs --sort cpu
+- name: system / disk free + usage
+  cmd: duf
+- name: system / interactive process viewer
+  cmd: btop
+
+- name: search / file content (ripgrep)
+  cmd: rg <pattern>
+- name: search / filenames (fd)
+  cmd: fd <pattern>
+- name: search / JSON (jq pretty-print)
+  cmd: jq . <file.json>
+- name: search / YAML (yq pretty-print)
+  cmd: yq . <file.yaml>
+
+- name: net / public IP
+  cmd: curl ifconfig.me
+- name: net / listening ports
   cmd: ss -tlnp
+
+- name: nvim / edit config file
+  cmd: nvim ~/nix-config/home/wesley/nvim.nix
+- name: nvim / open telescope keymap picker
+  cmd: <leader>?
