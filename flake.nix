@@ -48,6 +48,8 @@
                 imports = [
                   ./home/wesley/core.nix
                   ./home/wesley/fish.nix
+                  ./home/wesley/zsh.nix
+                  ./home/wesley/bash.nix
                   ./home/wesley/git.nix
                   ./home/wesley/terminal.nix
                   ./home/wesley/cli-tools.nix

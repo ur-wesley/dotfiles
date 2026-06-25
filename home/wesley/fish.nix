@@ -68,35 +68,66 @@
       end
     '';
 
+    # Interactive key bindings — bound here (outside the
+    # `status is-interactive` block) so they take effect in every
+    # interactive shell, including subshells.
+    binds = {
+      # navi: open the interactive cheatsheet (your snippets +
+      # tldr + fish aliases + shell history, fuzzy-searched). The
+      # default <C-g> binding is what navi's docs recommend.
+      ctrl-g = { command = "navi --print"; };
+    };
+
     # Aliases
     shellAliases = {
-      # Sane defaults
+      # Sane defaults — eza with icons + directories-first
       ll = "eza -la --group-directories-first --icons";
       l = "eza -l --group-directories-first --icons";
-      la = "eza -la --group-directories-first --icons";
       lt = "eza -T --level=2 --icons";
       lta = "eza -Ta --level=2 --icons";
-      cat = "bat --paging=never";
+
+      # cat → bat. Plain mode is pipe-safe (no decorations, no
+      # paging) so things like `cat file.json | jq` still work.
+      cat = "bat --style=plain --paging=never";
       catp = "bat --plain";
+
+      # Modern replacements
       grep = "rg";
       find = "fd";
       du = "dust";
       df = "duf";
       ps = "procs";
       top = "btop";
+      ping = "gping";
+      serve = "python3 -m http.server";
+      json = "jq";
+      xml = "xmllint --format -";
+
+      # Editor
       vim = "nvim";
       vi = "nvim";
-      hx = "hx";
       helix = "hx";
+
+      # Git (single-letter shortcuts)
       g = "git";
       lg = "lazygit";
       ld = "lazydocker";
+
+      # K8s
       k = "kubectl";
       kns = "kubens";
       kctx = "kubectx";
+
+      # Docker
       d = "docker";
       dc = "docker compose";
+
+      # Misc
       j = "just";
+
+      # VS Code
+      code = "code";
+      code-wsl = "code --remote wsl+NixOS";
 
       # Quick navigation
       ".." = "cd ..";
@@ -105,7 +136,7 @@
 
       # AI coding CLIs
       cc = "claude";
-      openclaude = "claude";
+      oc = "opencode";
 
       # Safety
       rm = "trash-put";
@@ -124,7 +155,9 @@
 
     # Functions (fish functions)
     functions = {
-      # Extract common archive types
+      # Extract common archive types. The fallback case is
+      # written with `printf` + fish string concat so filenames
+      # with spaces or quotes work.
       extract = "switch $argv[1]
         case '*.tar.bz2'
           tar xjf $argv[1]
@@ -149,7 +182,7 @@
         case '*.7z'
           7z x $argv[1]
         case '*'
-          echo \"'$argv[1]' cannot be extracted via extract()\"
+          printf '\"%s\" cannot be extracted via extract()\\n' $argv[1]
       end";
 
       # Create directory and cd into it
@@ -158,7 +191,8 @@
       # Open in nvim
       v = "nvim $argv";
 
-      # Git: status with short format
+      # Git helpers (functions shadow the abbreviations of the same
+      # name, so the abbreviation block below omits them)
       gst = "git status -sb";
       gco = "git checkout";
       gcb = "git checkout -b";
@@ -172,12 +206,14 @@
     # Completions (use default; custom completions go in this attr)
     # completions = { };
 
-    # Abbreviations (auto-expanded in command position)
+    # Abbreviations (auto-expanded in command position).
+    # Note: gco / gp / gl are NOT here — they're defined as fish
+    # functions above with extra flags (gco can take a branch arg
+    # without losing it, gp/gl have --rebase/--autostash). Functions
+    # win over abbreviations in fish, so duplicating here would
+    # silently override the function bodies.
     shellAbbrs = {
-      gco = "git checkout";
       gst = "git status";
-      gp = "git push";
-      gl = "git pull --rebase";
       gc = "git commit";
       ga = "git add";
       gd = "git diff";
@@ -201,7 +237,4 @@
       end
     '';
   };
-
-  # Enable fish completions for nushell-style stuff
-  programs.bash.enable = true;  # Keep bash for scripts
 }

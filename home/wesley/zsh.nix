@@ -14,31 +14,53 @@
       export PATH="$HOME/.local/bin:$PATH"
     '';
     shellAliases = {
-      # Sane defaults
+      # Sane defaults — eza with icons + directories-first
       ll = "eza -la --group-directories-first --icons";
       l = "eza -l --group-directories-first --icons";
-      la = "eza -la --group-directories-first --icons";
       lt = "eza -T --level=2 --icons";
       lta = "eza -Ta --level=2 --icons";
-      cat = "bat --paging=never";
+
+      # cat → bat. Plain mode is pipe-safe.
+      cat = "bat --style=plain --paging=never";
       catp = "bat --plain";
+
+      # Modern replacements
       grep = "rg";
       find = "fd";
       du = "dust";
       df = "duf";
       ps = "procs";
       top = "btop";
+
+      # Editor
       vim = "nvim";
       vi = "nvim";
+      helix = "hx";
+
+      # Git
       g = "git";
       lg = "lazygit";
       ld = "lazydocker";
+
+      # K8s
       k = "kubectl";
       kns = "kubens";
       kctx = "kubectx";
+
+      # Docker
       d = "docker";
       dc = "docker compose";
+
+      # Misc
       j = "just";
+
+      # VS Code
+      code = "code";
+      code-wsl = "code --remote wsl+NixOS";
+
+      # AI coding CLIs
+      cc = "claude";
+      oc = "opencode";
 
       # Quick navigation
       ".." = "cd ..";
@@ -62,15 +84,7 @@
     };
 
     initContent = /* shell */ ''
-      # ---- Environment ----
-      export EDITOR="nvim"
-      export VISUAL="nvim"
-      export PAGER="less"
-      export MANPAGER="less"
-      export TERMINAL="rio"
-      export LANG="en_US.UTF-8"
-      export LC_ALL="en_US.UTF-8"
-      export PATH="$HOME/.local/bin:$PATH"
+      # (env vars live in envExtra above; zsh-specific options here)
 
       # ---- zsh options ----
       setopt AUTO_CD
