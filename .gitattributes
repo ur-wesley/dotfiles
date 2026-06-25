@@ -1,0 +1,27 @@
+# Normalize all text files to LF in the repo, regardless of what
+# the OS / editor writes. Windows contributors often get CRLF by
+# default; without this attribute, every `git status` lights up
+# with phantom changes. Run `git rm --cached -r . && git add .` once
+# after adding this file to renormalize the existing tree.
+* text=auto eol=lf
+
+# Shell scripts, Nix, Lua, TOML, Markdown: force LF.
+*.sh        text eol=lf
+*.bash      text eol=lf
+*.nix       text eol=lf
+*.lua       text eol=lf
+*.toml      text eol=lf
+*.md        text eol=lf
+*.ps1       text eol=lf
+*.bat       text eol=lf
+
+# Binary files (no transformations).
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.ico       binary
+*.woff      binary
+*.woff2     binary
+*.ttf       binary
+*.otf       binary

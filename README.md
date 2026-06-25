@@ -1,7 +1,12 @@
 # nix-config
 
 Wesley's NixOS-WSL flake. Single source of truth for the entire dev
-environment on this Windows box.
+environment on this Windows box — shell, editor, terminal, dev tools,
+and dotfiles.
+
+The repo lives at `C:\Users\parac\nix-config` on the Windows side and
+is symlinked from `~/nix-config` inside WSL so both sides see the
+same files.
 
 ## Quick start
 
@@ -12,10 +17,10 @@ environment on this Windows box.
 irm https://raw.githubusercontent.com/ur-wesley/dotfiles/main/install/install.ps1 -Repo ur-wesley/dotfiles | iex
 ```
 
-This installs winget packages, NixOS-WSL, WezTerm, fonts, and clones this
+This installs winget packages, NixOS-WSL, fonts, and clones this
 repo. After the script finishes:
 
-1. Open **WezTerm** — it drops you into fish inside NixOS-WSL
+1. Open **WezTerm** or **Rio** — both drop you into fish inside NixOS-WSL
 2. Inside the WSL shell:
    ```fish
    sudo nixos-rebuild switch --flake ~/nix-config#nixos-wsl
@@ -37,7 +42,54 @@ git pull
 nrs   # alias: nixos-rebuild switch
 ```
 
-### WezTerm leader key (C-a)
+## Layout
+
+```
+nix-config/
+├── flake.nix                       # inputs + outputs
+├── flake.lock                      # auto-generated
+├── README.md                       # you are here
+├── .gitattributes                  # line-ending policy (LF)
+├── install/
+│   ├── install.ps1                 # one-shot Windows installer (winget + WSL + repo)
+│   ├── install.bat                 # .bat wrapper for double-click
+│   └── sync.ps1                    # pull latest config + apply on this PC
+├── dotfiles/                       # synced to Windows locations by sync.ps1
+│   ├── wezterm/wezterm.lua         # WezTerm config (fallback terminal)
+│   ├── rio/config.toml             # Rio terminal (daily driver)
+│   └── windows-terminal/settings.json   # Windows Terminal profiles
+├── hosts/nixos-wsl/
+│   └── configuration.nix           # NixOS system config (WSL)
+└── home/wesley/
+    ├── home.nix                    # user account, stateVersion
+    ├── core.nix                    # starship, fzf, zoxide, direnv, nix-direnv, atuin, mcfly
+    ├── fish.nix                    # fish shell + aliases + functions + abbrs
+    ├── git.nix                     # git + delta + gh + lazygit + git-cliff
+    ├── terminal.nix                # TUI tools (tmux/zellij binaries as fallback)
+    ├── cli-tools.nix               # eza, bat, ripgrep, fd, jq, yq, btop, yazi, opencode, claude-code
+    ├── dev-tools.nix               # docker, k8s, cloud CLIs, build tools
+    ├── zsh.nix                     # zsh fallback shell
+    └── nvim.nix                    # Nixvim (full editor config)
+```
+
+## Terminal
+
+Two terminals are configured. Pick whichever feels right:
+
+### Rio (daily driver)
+
+GPU-accelerated, minimal, dark by default with Catppuccin Mocha.
+Tab bar auto-hides when only one tab is open (`hide-if-single`).
+Hint mode (`Ctrl+Shift+O`) overlays labels on URLs so you can hit
+a letter to copy them. Glass/blur background, JetBrainsMono Nerd Font.
+
+Config: `dotfiles/rio/config.toml` (synced to
+`%USERPROFILE%\AppData\Local\rio\config.toml` by sync.ps1).
+
+### WezTerm (fallback)
+
+Tmux-style leader key on `C-a`. Splits, panes, tabs, workspaces
+(Dev / Dev2 / Win), copy mode, command palette, search.
 
 | Key | Action |
 |---|---|
@@ -49,62 +101,130 @@ nrs   # alias: nixos-rebuild switch
 | `C-a x` | Close pane |
 | `C-a t` | New tab |
 | `C-a n/p` | Next/prev tab |
-| `C-a c` | Close tab |
-| `C-a r` | Rename tab |
-| `C-a 1/2/3` | Switch workspace (Dev / Dev2 / Win) |
-| `C-a r` (SHIFT) | Reload config |
-| `C-a p` (SHIFT) | Command palette |
+| `C-a 1/2/3` | Switch workspace |
 | `C-a /` | Search |
 | `C-a f` | Copy mode |
+
+Config: `dotfiles/wezterm/wezterm.lua`.
+
+### Rio defaults (Ctrl+Shift+...)
+
+| Key | Action |
+|---|---|
+| `Ctrl+Shift+T` | New tab |
+| `Ctrl+Shift+N` | New window |
+| `Ctrl+Shift+R` | Reload config |
+| `Ctrl+Shift+W` | Close tab |
+| `Ctrl+Shift+P` | Command palette |
+| `Ctrl+Shift+F` | Search |
+| `Ctrl+Shift+O` | Hint mode (URLs, etc.) |
+| `Ctrl+Tab` / `Ctrl+Shift+Tab` | Next / prev tab |
+| `Ctrl+Shift+1..8` | Switch to tab N |
+
+## Shell (fish)
+
+fish is the default shell (`chsh` to swap; zsh/bash still available).
+Built-in autosuggestions, syntax highlighting, and tab completions.
+
+### Prompt (starship — Catppuccin Mocha, rounded pills)
+
+`❯ (wesley) ·(@Dev) ·(~/nix-config) ·git:( main) ·(go 1.23) ·(rust 1.83)`
+
+Rounded parens `(…)`, soft `·` separator dots between modules,
+each module in a distinct Catppuccin Mocha color. Time on the right
+edge.
+
+### Aliases (selection)
+
+| Alias | Runs |
+|---|---|
+| `ll`, `la`, `l`, `lt`, `lta` | `eza` variants with icons + directories-first |
+| `cat` → `bat`; `grep` → `rg`; `find` → `fd`; `du` → `dust`; `df` → `duf`; `ps` → `procs`; `top` → `btop`; `catp` → `bat --plain` |
+| `vim`/`vi` → `nvim` |
+| `g` → `git`; `lg` → `lazygit`; `ld` → `lazydocker` |
+| `k` → `kubectl`; `kns` → `kubens`; `kctx` → `kubectx` |
+| `nrs` | `sudo nixos-rebuild switch` |
+| `hms` | `home-manager switch --flake .` |
+| `nfu` | `nix flake update` + `nrs` |
+| `rm` → `trash-put` (recoverable) |
+
+Full list: `home/wesley/fish.nix`.
+
+### Abbreviations (auto-expanded in command position)
+
+`gco` `gst` `gp` `gl` `gc` `ga` `gd` `gb` `glg` → `git checkout`
+/ `status` / `push` / `pull --rebase` / `commit` / `add` / `diff`
+/ `branch` / `log --oneline --graph --decorate -20`.
+
+### Functions
+
+- `cd` → zoxide-backed (`z` with no args goes to the most-frequent dir)
+- `extract <file>` — untar/unzip/gunzip
+- `mkcd <dir>` — mkdir + cd
+- `v <file>` — nvim
+- `g` (with subcommand) — git with nicer defaults
+
+## Editor (Neovim via Nixvim)
+
+Leader key is **space**. Hotkey help is `mini.clue` — pressing
+`<leader>` shows a small inline hint strip at the bottom with
+pending bindings (200ms delay, no full-screen popup). For on-demand
+lookup, `<leader>?` opens a Telescope keymap picker.
+
+| Key | Action |
+|---|---|
+| `<space>ff` | Find files (Telescope) |
+| `<space>fg` | Live grep |
+| `<space>fb` | Buffers |
+| `<space>fh` | Help tags |
+| `<space>fr` | Recent files |
+| `<space>fc` | Commands |
+| `<space>fd` | Diagnostics |
+| `<space>fs` / `<space>fS` | LSP document / workspace symbols |
+| `<space>e` | Diagnostic float |
+| `<space>t` | Neo-tree file tree |
+| `<space>rn` | LSP rename |
+| `<space>ca` | LSP code action |
+| `<space>?` | Search all keymaps (Telescope) |
+| `gd` / `gD` / `gi` / `gr` | LSP definition / declaration / impl / refs |
+| `K` | LSP hover |
+| `<C-\>` | Toggle terminal |
+| `<A-j>` / `<A-k>` | Move lines up/down (visual mode) |
+| `<C-d>` / `<C-u>` | Half-page scroll + center |
+| `<C-j>` / `<C-k>` | Next / prev diagnostic |
+
+LSP servers: `ts_ls`, `pyright`, `rust_analyzer`, `gopls`, `clangd`,
+`jdtls`, `lua_ls`, `gleam`, `dartls`, `phpactor`, `terraformls`,
+`yamlls`, `jsonls`, `html`, `cssls`, `tailwindcss`, `bashls`,
+`zls`, `denols`. Install via `:MasonInstall` (auto-installs on first
+trigger if configured).
 
 ## What this gives you
 
 - **NixOS 26.05 (Yarara)** running inside WSL2 as the default distro,
   fully Nix-managed. Hostname: `Dev`.
 - **`wesley`** is the default user. Passwordless `sudo` via `wheel`.
-- **Home Manager** manages ~everything userland: shell, editor, tools,
-  dotfiles, git, gh, etc.
-- **fish** is the default shell (with zsh + bash still available).
-- **Nixvim** as the primary editor (30+ plugins, full LSP for every
-  language you use).
-- **WezTerm as the multiplexer** — splits, panes, tabs, workspaces,
-  copy mode, all in one app. tmux/zellij are kept as binaries only
-  (no autostart) as a fallback.
-- **Opinionated terminal stack**: `fish` + `starship` + `lazygit`
-  + `lazydocker` + `k9s` + `dive` + `yazi` + `btop` + `fzf` + `zoxide`
-  + `atuin` + `mcfly` + `direnv` + `nix-direnv` + `gh` + `delta`.
+- **Home Manager** manages ~everything userland: shell, editor,
+  terminal config, tools, dotfiles, git, gh, etc.
+- **fish** default shell, with **starship** prompt, **zoxide** `cd`,
+  **direnv** + **nix-direnv**, **atuin** + **mcfly** history,
+  **fzf** keybindings.
+- **Nixvim** primary editor (30+ plugins, full LSP for every
+  language you use, mini.clue for hotkey help, mini.clue `<leader>?`
+  for on-demand lookup).
+- **Rio** as the daily-driver terminal, **WezTerm** as the fallback.
+  Both spawn fish in NixOS-WSL. tmux/zellij are kept as binaries only
+  (no autostart).
+- **CLI stack**: `eza` `bat` `ripgrep` `fd` `jq` `yq` `fx` `sd` `choose`
+  `dust` `duf` `procs` `btop` `yazi` `broot` `glow` `mosh` `trash-cli`
+  `tldr` `pay-respects` `nix-ld` `lazygit` `lazydocker` `k9s` `dive`
+  `kubectx` `stern` `helm` `kustomize` `opentofu` `pulumi` `awscli2`
+  `azure-cli` `gcloud` `opencode` `claude-code`.
 - **Mise** on the Linux side still owns language runtimes (node, go,
   bun, rust, dotnet, python, luau, uv) so per-project pinning keeps
   working unchanged.
 - **Docker Desktop** on the Windows side provides the engine; the
   NixOS WSL distro talks to it over the named-pipe bridge.
-- **Portable installer** — run `install/install.ps1` on a fresh Windows
-  box and it bootstraps the same environment end-to-end.
-
-## Layout
-
-```
-nix-config/
-├── flake.nix                  # inputs + outputs
-├── flake.lock                 # auto-generated
-├── install/
-│   ├── install.ps1            # one-shot Windows installer (winget + WSL + repo sync)
-│   ├── install.bat            # .bat wrapper for double-click install
-│   └── sync.ps1               # pull latest config + apply on this PC
-├── dotfiles/
-│   ├── wezterm/wezterm.lua    # Windows-side WezTerm config
-│   └── windows-terminal/settings.json   # Windows Terminal profiles
-├── hosts/nixos-wsl/
-│   └── configuration.nix      # NixOS system config (WSL)
-└── home/wesley/
-    ├── core.nix               # starship, fzf, zoxide, direnv, nix-direnv
-    ├── fish.nix               # fish shell + aliases + functions + abbrs
-    ├── git.nix                # git + delta + gh config
-    ├── terminal.nix           # TUI tools (tmux/zellij binaries as fallback)
-    ├── cli-tools.nix          # eza, bat, ripgrep, fd, jq, yq, btop, yazi
-    ├── dev-tools.nix          # docker, k8s, cloud CLIs, build tools
-    └── nvim.nix               # Nixvim (full editor config)
-```
 
 ## Common tasks
 
@@ -127,22 +247,22 @@ nfu           # alias: nix flake update + nixos-rebuild + home-manager
 ### Roll back
 
 ```bash
-# NixOS keeps generations
 sudo nixos-rebuild --rollback switch
 ```
 
 ### WSL sudo setuid workaround (READ THIS)
 
-The nix store is on a separate ext4 partition that's remounted read-only
-during rebuilds. The setuid bit on `sudo` is lost after every rebuild.
-**After each rebuild, run:**
+The Nix store is on a separate ext4 partition that's remounted
+read-only during rebuilds. The setuid bit on `sudo` is lost after
+every rebuild. **After each rebuild, run as `root`**:
 
 ```bash
 sudo chmod 4755 /nix/store/*-sudo-rs*/bin/sudo
 ```
 
-(You can do this as `wesley` since sudo itself still has setuid from
-the previous fix.)
+As `wesley` this fails (the store path is owned by root and read-only
+after the rebuild remount). Run via `wsl -u root -- nix-config` or
+re-enter with `sudo -i` first.
 
 ### Add a new tool
 
@@ -160,80 +280,14 @@ Then `nrs` (or `sudo nixos-rebuild switch`).
 ### Add a new system package
 
 Edit `hosts/nixos-wsl/configuration.nix` and add to
-`environment.systemPackages`. This is for things that need to be
-available system-wide (currently kept minimal — vim, git, sudo, etc.).
+`environment.systemPackages`. For things that need to be available
+system-wide (currently kept minimal — vim, git, sudo, etc.).
 
 ### Add a new neovim plugin
 
 Edit `home/wesley/nvim.nix` and add to `programs.nixvim.plugins.<name>`.
 If the plugin doesn't have a Nixvim module, add it to `extraPlugins`
 and write Lua config in `extraConfigLua`.
-
-## Default user + shell
-
-`wesley` with **fish** as the default shell. Configured in
-`hosts/nixos-wsl/configuration.nix` under `users.users.wesley.shell = pkgs.fish`
-and `wsl.defaultUser = "wesley"`.
-
-zsh and bash remain available — use `chsh` or pass the shell as an
-argument to switch.
-
-## Shell (fish)
-
-fish is the default. It does autosuggestions, syntax highlighting, and
-tab completions out of the box. The `home/wesley/fish.nix` module
-adds: starship prompt, fzf keybindings, zoxide integration, mise
-activation, and ~30 aliases.
-
-Useful aliases (full list in `home/wesley/fish.nix`):
-
-- `ll`, `la`, `lt`, `lta` — `eza` variants
-- `cat` → `bat`; `grep` → `rg`; `find` → `fd`; `du` → `dust`; `df` → `duf`; `ps` → `procs`; `top` → `btop`
-- `vim`/`vi` → `nvim`
-- `g` → `git`; `lg` → `lazygit`; `ld` → `lazydocker`
-- `k` → `kubectl`; `kns` → `kubens`; `kctx` → `kubectx`
-- `nrs` → rebuild NixOS; `hms` → rebuild home-manager
-- `nfu` → update flake + rebuild both
-- `rm` → `trash-put` (recoverable delete)
-
-Useful functions:
-
-- `extract <file>` — untar/unzip/gunzip
-- `mkcd <dir>` — mkdir + cd
-- `v <file>` — nvim
-
-Abbreviations (auto-expanded when you type them as commands):
-
-- `gco` → `git checkout`
-- `gst` → `git status`
-- `gp`  → `git push`
-- `gl`  → `git pull --rebase`
-- `gc`  → `git commit`
-- `ga`  → `git add`
-- `gd`  → `git diff`
-- `gb`  → `git branch`
-- `glg` → `git log --oneline --graph --decorate -20`
-
-## Editor (Neovim via Nixvim)
-
-Leader key is **space**. Important bindings:
-
-- `<space>ff` — find files (Telescope)
-- `<space>fg` — live grep
-- `<space>fb` — buffers
-- `<space>e`  — diagnostic float
-- `<space>t`  — Neo-tree file tree
-- `<space>r`  — Telescope
-- `gd`/`gD`/`gi`/`gr` — LSP go to definition/declaration/impl/refs
-- `K`         — LSP hover
-- `<space>rn` — LSP rename
-- `<space>ca` — LSP code action
-- `<C-\>`     — toggle terminal
-- `<A-j>`/`<A-k>` — move lines up/down in visual mode
-
-LSP servers are pre-defined; install them via `:MasonInstall`
-(or they auto-install on first trigger if `mason-lspconfig` is configured
-to auto-install).
 
 ## WSL config
 
@@ -243,40 +297,58 @@ to auto-install).
 - Docker socket: Docker Desktop's WSL integration is enabled
   manually (Docker Desktop → Settings → Resources → WSL
   Integration → enable NixOS).
-- WezTerm is configured on the Windows side to default to
-  `wsl.exe -d NixOS -- fish -l` (see `~/.config/wezterm/wezterm.lua`).
+- The repo lives at `C:\Users\parac\nix-config` on the Windows side
+  and is symlinked from `~/nix-config` inside WSL via
+  `ln -s /mnt/c/Users/parac/nix-config ~/nix-config`. Both sides
+  see the same files; `realpath` resolves through the symlink so
+  Nix can build transparently.
 
-## What this flake does NOT touch (yet)
+## Filesystem layout on disk
 
-Per your "skip for now" call, the following are deferred:
-
-- VS Code extensions (currently 77 installed — candidates for pruning)
-- AI tool dotfolders (`.claude`, `.cursor`, `.codex`, `.gemini`, `.qwen`, `.junie`, `.copilot`, `.antigravity`, `.ghcp-appmod`)
-- Native Windows toolchains (Python 3.11, Java 8, .NET 9, PHP 8.4, PostgreSQL 18 on Windows — can be moved into NixOS)
-- ~~Arch WSL distro~~ — done; `wsl --unregister archlinux`
-- ~~Podman machine~~ — done; `wsl --unregister podman-machine-default`
-
-When you're ready, see the "Cleanup TODO" at the bottom.
+| Path | Lives in |
+|---|---|
+| `~/nix-config` | symlink → `C:\Users\parac\nix-config` (Windows NTFS) |
+| `~/.config/starship.toml` | symlink → `/nix/store/...home-manager-files/.config/starship.toml` |
+| `~/.config/wezterm/wezterm.lua` | symlink → `/nix/store/...home-manager-files/.config/wezterm/wezterm.lua` |
+| `~/.config/nvim` | generated by nixvim into `/nix/store/...` |
+| Windows Terminal settings | `dotfiles/windows-terminal/settings.json` → synced by `sync.ps1` |
+| Rio config | `dotfiles/rio/config.toml` → synced by `sync.ps1` to `%USERPROFILE%\AppData\Local\rio\config.toml` |
 
 ## Useful references
 
 - [NixOS manual](https://nixos.org/manual/nixos/stable/)
-- [Home Manager options search](https://home-manager-options.extranix.com/)
+- [Home Manager options](https://home-manager-options.extranix.com/)
 - [Nixvim options](https://nixvim.pta2002.com/)
 - [nixos-wsl docs](https://github.com/nix-community/nixos-wsl)
 - [fish shell docs](https://fishshell.com/docs/current/)
+- [Rio terminal docs](https://rioterm.com/docs/config)
+- [WezTerm docs](https://wezfurlong.org/wezterm/config/files.html)
 
 ## Cleanup TODO
 
-When ready, address:
+Done:
 
-- [ ] Prune VS Code to ~12 essentials (run from PowerShell):
-      `code --list-extensions | ForEach-Object { code --uninstall-extension $_ }`
-      then install only what you actually use.
-- [ ] Pick 1-2 AI coding CLIs from `.claude`, `.codex`, `.gemini`, `.qwen`, `.junie`, `.copilot`, `.antigravity`, `.ghcp-appmod`, `.ghcp-appmod-java`, `.glzr` and delete the others.
-- [ ] Uninstall native Windows Python, Java, .NET, PHP, PostgreSQL — use the NixOS versions instead.
 - [x] ~~Remove `archlinux` WSL distro~~ — done; `wsl --unregister archlinux`
 - [x] ~~Remove `podman-machine-default`~~ — done; `wsl --unregister podman-machine-default`
-- [ ] Move projects from `C:\Users\parac\Projects` to `~/code/` inside NixOS for filesystem perf.
-- [ ] Wire VS Code to use the NixOS LSP servers via `Remote - SSH` to `localhost` (NixOS WSL).
-- [ ] Remove the `sudo chmod 4755` workaround by switching to a WSL-friendly sudo (e.g. add it to a sudo-wrapped nix store path or use `nixos-rebuild` via `wsl -u root`).
+- [x] ~~Move dotfiles repo to Windows + symlink~~ — done; `~/nix-config` → `C:\Users\parac\nix-config`
+- [x] ~~Replace which-key with mini.clue in nvim~~ — done
+
+Still to do:
+
+- [ ] Prune VS Code to ~12 essentials:
+      `code --list-extensions | ForEach-Object { code --uninstall-extension $_ }`
+      then install only what you actually use.
+- [ ] Pick 1-2 AI coding CLIs from `.claude`, `.codex`, `.gemini`,
+      `.qwen`, `.junie`, `.copilot`, `.antigravity`, `.ghcp-appmod`
+      and delete the others. Current default: opencode + claude-code.
+- [ ] Uninstall native Windows Python, Java, .NET, PHP, PostgreSQL —
+      use the NixOS versions instead.
+- [ ] Move projects from `C:\Users\parac\Projects` to `~/code/`
+      inside NixOS for filesystem perf.
+- [ ] Wire VS Code to use the NixOS LSP servers via
+      `Remote - SSH` to `localhost` (NixOS WSL).
+- [ ] Bump opencode to the latest upstream release
+      (currently pinned to nixpkgs's 1.17.7; latest is 1.17.10).
+- [ ] Remove the `sudo chmod 4755` workaround by switching to a
+      WSL-friendly sudo (e.g. add it to a sudo-wrapped nix store
+      path or use `nixos-rebuild` via `wsl -u root`).
