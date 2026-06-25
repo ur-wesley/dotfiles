@@ -59,6 +59,13 @@
     tldr
   ];
 
+  # Ship personal navi cheatsheets alongside the package so they
+  # show up the first time `navi` is invoked. The file at
+  # `dotfiles/navi/welcome.yaml` is the source of truth — sync
+  # from the repo with `install/sync.ps1` and re-run
+  # `home-manager switch` to refresh.
+  xdg.configFile."navi/welcome.yaml".source = ../../dotfiles/navi/welcome.yaml;
+
   # Better diff
   programs.broot = {
     enable = true;
