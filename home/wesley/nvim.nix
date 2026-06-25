@@ -122,15 +122,13 @@
         enable = true;
       };
 
-      which-key = {
+      # Hotkey help: modern replacement for which-key.
+      # mini.clue shows pending keybindings inline in the cmdline
+      # area (no full-screen popup), with a short delay so
+      # single-key presses don't trigger it. Press <leader>? to
+      # open a Telescope keymap search for on-demand lookup.
+      mini-clue = {
         enable = true;
-        settings = {
-          plugins = {
-            marks = true;
-            registers = true;
-            spelling = true;
-          };
-        };
       };
 
       neo-tree = {
@@ -383,6 +381,8 @@
       vim.keymap.set("n", "<leader>fh", telescope.help_tags, {})
       vim.keymap.set("n", "<leader>fr", telescope.oldfiles, {})
       vim.keymap.set("n", "<leader>fc", telescope.commands, {})
+      -- Hotkey help: search all current keymaps via Telescope.
+      vim.keymap.set("n", "<leader>?", telescope.keymaps, {})
       vim.keymap.set("n", "<leader>fd", telescope.diagnostics, {})
       vim.keymap.set("n", "<leader>fs", function() telescope.lsp_document_symbols({ symbols = "document" }) end, {})
       vim.keymap.set("n", "<leader>fS", telescope.lsp_workspace_symbols, {})
@@ -393,6 +393,28 @@
 
       -- Toggleterm keymap
       vim.keymap.set("n", "<C-\\>", "<cmd>ToggleTerm<cr>")
+
+      -- mini.clue: pending-keymap hints. Modern replacement for
+      -- which-key's full-screen popup — shows a small, delay-
+      -- triggered hint at the bottom of the screen. <leader>?
+      -- opens a Telescope picker for on-demand lookup.
+      require("mini.clue").setup({
+        triggers = {
+          -- auto-show after typing <leader>, g, or [ in normal/visual
+          { mode = { "n", "v" }, keys = "<leader>" },
+          { mode = { "n", "v" }, keys = "g" },
+          { mode = { "n" }, keys = "[" },
+        },
+        clues = {
+          enable_mark = true,
+          enable_register = true,
+          enable_spell_suggestions = true,
+        },
+        delay = 200,
+        window = {
+          config = function() return { anchor = "C", border = "none", width = 60, height = 10 } end,
+        },
+      })
 
       -- Autocmds
       vim.api.nvim_create_autocmd("FileType", {
