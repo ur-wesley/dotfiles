@@ -1,7 +1,7 @@
 # Wesley's config sync — pulls latest nix-config and reapplies
 # Run from PowerShell as Administrator. Will:
 #   1. git pull in the nix-config repo
-#   2. Sync Rio + Windows Terminal + mise configs to Windows locations
+#   2. Sync Rio + Windows Terminal + mise + navi configs
 #   3. Trigger nixos-rebuild inside the WSL distro
 
 [CmdletBinding()]
@@ -58,6 +58,17 @@ $miseDir = "$env:USERPROFILE\.config\mise"
 New-Item -ItemType Directory -Path $miseDir -Force | Out-Null
 Copy-Item "$NixConfigDir\dotfiles\mise\config.toml" "$miseDir\config.toml" -Force
 Ok "mise config synced (run 'mise install' to pick up new tools)"
+
+# 2d. navi cheatsheets (Linux + Windows; navi merges them all)
+Step "Syncing navi cheatsheets"
+$naviDir = "$env:USERPROFILE\.config\navi"
+New-Item -ItemType Directory -Path $naviDir -Force | Out-Null
+if (Test-Path "$NixConfigDir\dotfiles\navi") {
+    Get-ChildItem -Path "$NixConfigDir\dotfiles\navi" -File | ForEach-Object {
+        Copy-Item $_.FullName -Destination $naviDir -Force
+    }
+}
+Ok "navi cheatsheets synced"
 
 # 3. NixOS rebuild inside WSL
 Step "Applying NixOS rebuild inside WSL"

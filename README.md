@@ -57,6 +57,7 @@ nix-config/
 ├── dotfiles/                       # synced to Windows locations by sync.ps1
 │   ├── rio/config.toml             # Rio terminal config (Windows-side)
 │   ├── mise/config.toml            # mise runtime manager config
+│   ├── navi/welcome.yaml           # navi cheatsheet snippets (Linux + Windows)
 │   └── windows-terminal/settings.json   # Windows Terminal profiles
 ├── hosts/nixos-wsl/
 │   └── configuration.nix           # NixOS system config (WSL)
@@ -117,23 +118,32 @@ edge.
 
 | Alias | Runs |
 |---|---|
-| `ll`, `la`, `l`, `lt`, `lta` | `eza` variants with icons + directories-first |
-| `cat` → `bat`; `grep` → `rg`; `find` → `fd`; `du` → `dust`; `df` → `duf`; `ps` → `procs`; `top` → `btop`; `catp` → `bat --plain` |
-| `vim`/`vi` → `nvim` |
+| `ll`, `l`, `lt`, `lta` | `eza` variants with icons + directories-first |
+| `cat` → `bat --style=plain --paging=never` (pipe-safe); `catp` → `bat --plain` |
+| `grep` → `rg`; `find` → `fd`; `du` → `dust`; `df` → `duf`; `ps` → `procs`; `top` → `btop`; `ping` → `gping` |
+| `vim`/`vi` → `nvim`; `helix` → `hx` |
 | `g` → `git`; `lg` → `lazygit`; `ld` → `lazydocker` |
 | `k` → `kubectl`; `kns` → `kubens`; `kctx` → `kubectx` |
+| `d` → `docker`; `dc` → `docker compose` |
+| `code` → VS Code; `code-wsl` → opens dir in WSL extension |
+| `cc` → `claude`; `oc` → `opencode` |
 | `nrs` | `sudo nixos-rebuild switch` |
 | `hms` | `home-manager switch --flake .` |
 | `nfu` | `nix flake update` + `nrs` |
 | `rm` → `trash-put` (recoverable) |
 
-Full list: `home/wesley/fish.nix`.
+Full list: `home/wesley/fish.nix` (zsh/bash mirrors in
+`home/wesley/zsh.nix` and `home/wesley/bash.nix`).
 
 ### Abbreviations (auto-expanded in command position)
 
-`gco` `gst` `gp` `gl` `gc` `ga` `gd` `gb` `glg` → `git checkout`
-/ `status` / `push` / `pull --rebase` / `commit` / `add` / `diff`
-/ `branch` / `log --oneline --graph --decorate -20`.
+`gst` `gc` `ga` `gd` `gds` `gb` `glg` → `git status` / `commit`
+/ `add` / `diff` / `diff --staged` / `branch` / `log --oneline --graph --decorate -20`.
+
+`gco` / `gp` / `gl` are defined as **fish functions** above (they
+take extra flags like `--rebase --autostash`); abbreviations of
+the same name would be shadowed by the functions, so they are
+intentionally not duplicated here.
 
 ### Functions
 
@@ -142,6 +152,28 @@ Full list: `home/wesley/fish.nix`.
 - `mkcd <dir>` — mkdir + cd
 - `v <file>` — nvim
 - `g` (with subcommand) — git with nicer defaults
+
+### Cheatsheet (`navi` + `tldr`)
+
+Press **<kbd>Ctrl</kbd>+<kbd>g</kbd>** in any interactive shell to open
+**navi** — a fuzzy-searchable cheatsheet overlay. It merges:
+
+- **Your snippets** in `dotfiles/navi/welcome.yaml` (nix-config
+  rebuild, dotfiles sync, docker, k8s, git, system — the commands
+  you actually use daily)
+- **All `tldr` pages** for ~3000 common CLI tools
+- **Your shell history** (search past commands)
+- **Your fish aliases** (search `g`, `k`, `nrs`, …)
+
+Type to filter, <kbd>Enter</kbd> to run, <kbd>Esc</kbd> to cancel.
+
+For one-off lookups without navi: `tldr <cmd>` (e.g. `tldr ffmpeg`,
+`tldr jq`). Shows 5-8 practical examples per command, much faster
+than reading `man`.
+
+Add new snippets by editing `dotfiles/navi/welcome.yaml` and running
+`sync.ps1`. Format reference:
+<https://github.com/denisidoro/navi/blob/master/docs/snippet_templates.md>
 
 ## Editor (Neovim via Nixvim)
 
@@ -199,7 +231,7 @@ trigger if configured).
   `dust` `duf` `procs` `btop` `yazi` `broot` `glow` `mosh` `trash-cli`
   `tldr` `pay-respects` `nix-ld` `lazygit` `lazydocker` `k9s` `dive`
   `kubectx` `stern` `helm` `kustomize` `opentofu` `pulumi` `awscli2`
-  `azure-cli` `gcloud` `opencode` `claude-code`.
+  `azure-cli` `gcloud` `opencode` `claude-code` `navi`.
 - **mise** owns language runtimes (node, bun, python/uv, luau,
   rust, go, etc.). The default tool set is in
   `dotfiles/mise/config.toml` (synced to `~/.config/mise/`); per-project
