@@ -2,7 +2,7 @@
 #
 # This is a single-file portable installer. It installs everything
 # needed to get the same dev environment as the host machine, then
-# syncs the nix-config and wezterm config from a Git repo.
+# syncs the nix-config and Rio terminal config from a Git repo.
 #
 # Usage (PowerShell, run as Administrator):
 #   iwr -useb https://raw.githubusercontent.com/<owner>/<repo>/main/install.ps1 | iex
@@ -18,7 +18,6 @@ param(
     [string]$Branch = "main",
     [string]$NixConfigDir = "$HOME\nix-config",
     [switch]$SkipNixOS = $false,    # skip WSL NixOS install
-    [switch]$SkipWezTerm = $false,   # skip WezTerm install
     [switch]$SkipRepos = $false,     # skip git clone/fetch
     [switch]$SkipVSCode = $false,    # skip VS Code
     [switch]$SkipFonts = $false,     # skip fonts
@@ -65,7 +64,6 @@ if (-not $SkipNixOS) {
 $wingetPackages = @(
     @{ id = "Microsoft.PowerShell";         name = "PowerShell 7" },
     @{ id = "Microsoft.VisualStudioCode";    name = "VS Code"; skip = $SkipVSCode },
-    @{ id = "wez.wezterm";                  name = "WezTerm"; skip = $SkipWezTerm },
     @{ id = "GitHub.cli";                    name = "GitHub CLI" },
     @{ id = "Schniz.fnm";                    name = "Fast Node Manager" },
     @{ id = "OpenJS.NodeJS.LTS";             name = "Node.js LTS" },
@@ -79,6 +77,7 @@ $wingetPackages = @(
     @{ id = "7zip.7zip";                     name = "7-Zip" },
     @{ id = "Notepad++.Notepad++";           name = "Notepad++" },
     @{ id = "voidtools.Everything";           name = "Everything Search" },
+    @{ id = "jdxcode.mise";                   name = "mise (runtime manager, runs on Windows for use from PowerShell)" },
 )
 
 Step "Installing Windows packages via winget"
@@ -194,13 +193,6 @@ if (-not $SkipRepos) {
         Ok "nix-config cloned"
     }
 
-    # WezTerm config
-    Step "Syncing WezTerm config to ~/.config/wezterm/"
-    $wtDir = "$env:USERPROFILE\.config\wezterm"
-    New-Item -ItemType Directory -Path $wtDir -Force | Out-Null
-    Copy-Item -Path "$NixConfigDir\dotfiles\wezterm\wezterm.lua" -Destination "$wtDir\wezterm.lua" -Force
-    Ok "WezTerm config synced"
-
     # Windows Terminal settings (only adds NixOS profile if missing)
     Step "Patching Windows Terminal settings for NixOS"
     $wtSettings = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
@@ -220,7 +212,7 @@ if (-not $SkipRepos) {
 
 # ---- Done -------------------------------------------------------------
 Step "Done. Next steps:"
-Write-Host "  1. Open WezTerm — it will drop you into fish inside NixOS-WSL" -ForegroundColor Green
+Write-Host "  1. Open Windows Terminal (the NixOS profile drops you into fish in WSL)" -ForegroundColor Green
 Write-Host "  2. Inside the WSL shell, run:" -ForegroundColor Green
 Write-Host "       sudo nixos-rebuild switch --flake ~$HOME_USER/nix-config#nixos-wsl" -ForegroundColor Green
 Write-Host "  3. After rebuild, the prompt + tools are live" -ForegroundColor Green

@@ -40,6 +40,6 @@ if %errorlevel% neq 0 (
 
 echo.
 echo ============================================================
-echo  Done! Open WezTerm to start working.
+echo  Done! Open Windows Terminal and pick the NixOS profile.
 echo ============================================================
 pause
