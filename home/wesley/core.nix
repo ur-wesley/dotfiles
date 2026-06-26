@@ -70,6 +70,7 @@
     # Written by home-manager; do not edit by hand.
     "$schema" = "https://starship.rs/config-schema.json"
     command_timeout = 1000
+    scan_timeout = 5000
     continuation_prompt = "[▸▸](bold blue)"
 
     # Top-level: just concatenate modules; each module styles itself.
