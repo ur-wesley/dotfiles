@@ -49,7 +49,6 @@
 
     # CLI dev tools
     gh                              # GitHub CLI
-    opencode                        # opencode AI coding CLI
     claude-code                     # Anthropic Claude Code CLI
 
     # Cheatsheet tools — `navi` for personal/fuzzy, `tldr` for

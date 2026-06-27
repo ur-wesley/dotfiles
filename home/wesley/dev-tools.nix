@@ -15,21 +15,7 @@
     buildkit
     skopeo
 
-    # Kubernetes
-    kubectl
-    kubectx
-    stern
-    k9s
-    helm
-    kustomize
-    argocd
-    fluxcd
-
-    # Cloud CLIs
-    awscli2
-    azure-cli
-    google-cloud-sdk
-    doctl
+    # IaC
     opentofu
     pulumi
     ansible
@@ -49,5 +35,14 @@
   home.file.".docker/config".text = ''
     # Docker client config; engine is provided by Docker Desktop on Windows
     # via the named pipe //./pipe/docker_engine mapped into WSL.
+  '';
+
+  # Install opencode globally via mise-managed bun on every home-manager activation
+  home.activation.installOpencode = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    if command -v bun >/dev/null 2>&1; then
+      if ! command -v opencode >/dev/null 2>&1; then
+        run --quiet bun install -g opencode-ai
+      fi
+    fi
   '';
 }

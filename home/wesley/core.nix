@@ -42,6 +42,10 @@
       auto_sync = false;
       search_mode = "fuzzy";
       style = "auto";
+      # Up arrow cycles through history inline (native shell feel) instead
+      # of opening the atuin TUI. Use Ctrl-Up (or the search keybind) to
+      # open the full fuzzy search.
+      up_arrow_mapping = "shell";
     };
   };
 

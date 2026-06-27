@@ -67,8 +67,8 @@ nix-config/
     ├── fish.nix                    # fish shell + aliases + functions + abbrs
     ├── git.nix                     # git + delta + gh + lazygit + git-cliff
     ├── terminal.nix                # TUI tools (tmux/zellij binaries as fallback)
-    ├── cli-tools.nix               # eza, bat, ripgrep, fd, jq, yq, btop, yazi, opencode, claude-code
-    ├── dev-tools.nix               # docker, k8s, cloud CLIs, build tools
+    ├── cli-tools.nix               # eza, bat, ripgrep, fd, jq, yq, btop, yazi, claude-code
+    ├── dev-tools.nix               # docker, k8s, cloud CLIs, build tools, opencode (via bun)
     ├── zsh.nix                     # zsh fallback shell
     └── nvim.nix                    # Nixvim (full editor config)
 ```
@@ -230,8 +230,7 @@ trigger if configured).
 - **CLI stack**: `eza` `bat` `ripgrep` `fd` `jq` `yq` `fx` `sd` `choose`
   `dust` `duf` `procs` `btop` `yazi` `broot` `glow` `mosh` `trash-cli`
   `tldr` `pay-respects` `nix-ld` `lazygit` `lazydocker` `k9s` `dive`
-  `kubectx` `stern` `helm` `kustomize` `opentofu` `pulumi` `awscli2`
-  `azure-cli` `gcloud` `opencode` `claude-code` `navi`.
+  `opentofu` `pulumi` `claude-code` `navi` (opencode installed via bun).
 - **mise** owns language runtimes (node, bun, python/uv, luau,
   rust, go, etc.). The default tool set is in
   `dotfiles/mise/config.toml` (synced to `~/.config/mise/`); per-project
