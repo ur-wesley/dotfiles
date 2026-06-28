@@ -89,3 +89,8 @@
   cmd: nvim ~/nix-config/home/wesley/nvim.nix
 - name: nvim / open telescope keymap picker
   cmd: <leader>?
+
+- name: gentle-ai / install (Gentleman-Programming community AI stack)
+  cmd: 'curl -fsSL https://raw.githubusercontent.com/Gentleman-Programming/gentle-ai/main/scripts/install.sh | bash'
+- name: gentle-ai / open GitHub repo
+  cmd: open https://github.com/Gentleman-Programming/gentle-ai

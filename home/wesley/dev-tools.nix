@@ -45,4 +45,18 @@
       fi
     fi
   '';
+
+  # Install gentle-ai (Gentleman-Programming community AI stack) once on
+  # first activation. Idempotent via a marker file in XDG_DATA_HOME so
+  # the install script (curl | bash) doesn't re-run on every rebuild.
+  # Re-install: rm ~/.local/share/gentle-ai/.installed-by-home-manager
+  home.activation.installGentleAi = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    if [ ! -f "$HOME/.local/share/gentle-ai/.installed-by-home-manager" ]; then
+      mkdir -p "$HOME/.local/share/gentle-ai"
+      run --quiet ${pkgs.curl}/bin/curl -fsSL \
+        https://raw.githubusercontent.com/Gentleman-Programming/gentle-ai/main/scripts/install.sh \
+        | ${pkgs.bash}/bin/bash
+      touch "$HOME/.local/share/gentle-ai/.installed-by-home-manager"
+    fi
+  '';
 }
