@@ -242,8 +242,12 @@ default_shell "fish"
 // Mirror session across multiple terminals (mirrored cursor).
 mirror_session true
 
-// Use bundled single-pane "dev" layout (fish pane + tab bar).
-// Layout is in dotfiles/config/zellij/layouts/dev.kdl.
+// Use built-in single-pane "default" layout (just fish, no plugins
+// that might fail to load and cause zellij to exit). Switch to
+// "dev" later if you want the bottom tab bar.
+default_layout "default"
+
+// Layout directory kept for "dev" / custom layouts.
 layout_dir "/home/wesley/nix-config/dotfiles/config/zellij/layouts"
 
 // Theme files in dotfiles/config/zellij/themes/.
