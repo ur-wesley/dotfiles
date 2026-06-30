@@ -4,7 +4,7 @@
 # Mirrors the omerxx/dotfiles structure: one tree, one install command.
 #
 # Usage (PowerShell, run as Administrator):
-#   $f = "$env:TEMP\install.ps1"; irm https://raw.githubusercontent.com/<owner>/<repo>/main/install/install.ps1 -OutFile $f; (Get-Content $f -Raw) -replace "`n","`r`n" | Set-Content $f -NoNewline; & $f
+#   $f="$env:TEMP\install.ps1"; irm https://raw.githubusercontent.com/<owner>/<repo>/main/install/install.ps1 -OutFile $f; (Get-Content $f -Raw) -replace "`n","`r`n" | Set-Content $f -NoNewline; & $f
 #
 # Requirements: Windows 10/11, internet, ~30 GB free disk.
 
