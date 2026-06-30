@@ -142,7 +142,7 @@
       cc = "claude";
       oc = "opencode";
       gentle = "gentle-ai";
-      tv = "television";
+      tv = "tv";
       zj = "zellij attach --create";
 
       # Cheatsheets

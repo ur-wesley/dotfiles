@@ -161,8 +161,8 @@ if (Get-Command opencode -ErrorAction SilentlyContinue) {
 if (Get-Command gentle-ai -ErrorAction SilentlyContinue) {
     Set-Alias -Name ga -Value gentle-ai -Scope Global -Force
 }
-if (Get-Command television -ErrorAction SilentlyContinue) {
-    Set-Alias -Name tv -Value television -Scope Global -Force
+if (Get-Command tv -ErrorAction SilentlyContinue) {
+    Set-Alias -Name tv -Value tv -Scope Global -Force
 }
 
 # ---- Cheatsheet ----------------------------------------------------
