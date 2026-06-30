@@ -296,7 +296,7 @@ Write-Host "  2. From inside WSL, run 'zj' to start zellij (Catppuccin Mocha)" -
 Write-Host "  3. Press Ctrl+F to open television (fuzzy file finder)" -ForegroundColor Green
 Write-Host "  4. Press Ctrl+G to open navi (cheatsheets)" -ForegroundColor Green
 Write-Host ""
-Write-Host "  Daily sync: re-run this script, or cd $NixConfigDir\dotfiles && make restow (inside WSL)" -ForegroundColor DarkGray
-Write-Host "  Inside WSL: cd ~/nix-config/dotfiles && make restow" -ForegroundColor DarkGray
+Write-Host "  Daily sync: re-run this script, or cd $NixConfigDir\dotfiles; make restow (inside WSL)" -ForegroundColor DarkGray
+Write-Host "  Inside WSL: cd ~/nix-config/dotfiles; make restow" -ForegroundColor DarkGray
 Write-Host ""
 Ok "All set. Welcome to the new box."
