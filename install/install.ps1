@@ -66,6 +66,7 @@ $wingetPackages = @(
     # Dev environment
     @{ id = "Microsoft.PowerShell";         name = "PowerShell 7" },
     @{ id = "Microsoft.VisualStudioCode";    name = "VS Code"; skip = $SkipVSCode },
+    @{ id = "ZedIndustries.Zed";             name = "Zed" },
     @{ id = "GitHub.cli";                    name = "GitHub CLI" },
     @{ id = "Git.Git";                       name = "Git" },
     @{ id = "Docker.DockerDesktop";          name = "Docker Desktop" },
@@ -80,7 +81,7 @@ $wingetPackages = @(
     # Modern Unix CLI — fish-parity stack for PowerShell 7.
     # See dotfiles/home/powershell/Microsoft.PowerShell_profile.ps1
     @{ id = "gerardog.gsudo";                name = "gsudo (sudo for Windows)" },
-    @{ id = "BurntSushi.ripgrep";            name = "ripgrep" },
+    @{ id = "BurntSushi.ripgrep.MSVC";        name = "ripgrep" },
     @{ id = "sharkdp.fd";                    name = "fd" },
     @{ id = "sharkdp.bat";                   name = "bat" },
     @{ id = "eza-community.eza";             name = "eza" },
