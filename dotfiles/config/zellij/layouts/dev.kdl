@@ -1,16 +1,21 @@
-// Wesley's zellij default layout — single pane, fish shell.
-// Tab bar at the bottom. Resizes gracefully to any terminal size.
+// Wesley's zellij default layout — single fish pane + bottom tab bar.
+// Splits happen on demand via Ctrl+P then n (below) / s (side) / v (vertical).
+// Resizes gracefully to any terminal size.
 layout {
+    // The default template applied when a new tab is opened.
     default_tab_template {
-        // Single pane that fills the terminal.
+        // First pane: shell (fish) — fills the tab.
+        pane size=1 {
+            // The fish shell inside WSL. zellij will use $SHELL if this
+            // is omitted, but being explicit makes session recovery easier.
+            command "fish"
+        }
+        // Tab bar pinned to the bottom — only shown when 2+ tabs exist
+        // (because zellij's hide-if-single plugin setting is on by default).
         pane size=1 borderless=true {
             plugin location="zellij:tab-bar" {
-                // Bottom tab bar — matches the theme's ribbon style.
                 tab_bar_position "bottom"
             }
         }
     }
 }
-
-// Optional pane tree — currently empty so zellij starts with one pane.
-// User splits on demand via Ctrl+P then n (below) / s (side) / v (vertical stack).
