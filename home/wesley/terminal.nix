@@ -1,9 +1,8 @@
 { config, pkgs, lib, ... }:
 
 {
-  # NOTE: Rio (on the Windows side) is the daily-driver terminal.
-  # tmux/zellij binaries are kept as a fallback for raw SSH sessions
-  # or if you ever need a detached session; we do not autostart them.
+  # NOTE: Zellij is now the daily-driver terminal multiplexer (see home/wesley/zellij.nix).
+  # It runs inside WSL on Windows Terminal / Rio. Sessions persist across reboots.
 
   home.packages = with pkgs; [
     btop

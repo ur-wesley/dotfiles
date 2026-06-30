@@ -1,0 +1,17 @@
+# channels/files.toml — fuzzy find files in cwd using fd.
+# Bound to Ctrl+F in fish via `tv files`.
+
+[metadata]
+name = "files"
+description = "Fuzzy find files in current directory"
+requirements = ["fd"]
+
+[source]
+command = "fd --hidden --no-ignore --type f --exclude .git --exclude node_modules"
+
+[preview]
+command = "bat --color=always --style=numbers {1} 2>/dev/null || cat {1} 2>/dev/null"
+env = { BAT_THEME = "Catppuccin Mocha" }
+
+[keybindings]
+select = ["enter"]

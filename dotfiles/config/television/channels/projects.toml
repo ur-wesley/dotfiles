@@ -1,0 +1,15 @@
+# channels/projects.toml — projects under ~/code/ (or %USERPROFILE%\code).
+# Bound via `tv projects`.
+
+[metadata]
+name = "projects"
+description = "Projects under ~/code"
+
+[source]
+command = "find ~/code -mindepth 1 -maxdepth 2 -type d 2>/dev/null | head -200"
+
+[preview]
+command = "ls -la {1} | head -20 && echo --- && cat {1}/README.md 2>/dev/null | head -30"
+
+[keybindings]
+select = ["enter"]

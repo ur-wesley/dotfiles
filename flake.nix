@@ -54,6 +54,8 @@
                   ./home/wesley/terminal.nix
                   ./home/wesley/cli-tools.nix
                   ./home/wesley/dev-tools.nix
+                  ./home/wesley/zellij.nix
+                  ./home/wesley/television.nix
                   ./home/wesley/nvim.nix
                 ];
                 home = {

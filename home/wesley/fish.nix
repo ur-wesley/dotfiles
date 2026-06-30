@@ -76,6 +76,10 @@
       # tldr + fish aliases + shell history, fuzzy-searched). The
       # default <C-g> binding is what navi's docs recommend.
       ctrl-g = { command = "navi --print"; };
+
+      # television: fuzzy find files in current directory.
+      # Channel switching: Alt+1..Alt+5 for files/git-files/env/recent/projects.
+      ctrl-f = { command = "tv files"; };
     };
 
     # Aliases
@@ -137,6 +141,12 @@
       # AI coding CLIs
       cc = "claude";
       oc = "opencode";
+      gentle = "gentle-ai";
+      tv = "television";
+      zj = "zellij attach --create";
+
+      # Cheatsheets
+      cheat = "navi";
 
       # Safety
       rm = "trash-put";

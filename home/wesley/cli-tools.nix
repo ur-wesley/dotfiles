@@ -50,6 +50,7 @@
     # CLI dev tools
     gh                              # GitHub CLI
     claude-code                     # Anthropic Claude Code CLI
+    television                      # Rust fuzzy finder (TUI)
 
     # Cheatsheet tools — `navi` for personal/fuzzy, `tldr` for
     # community-maintained short examples. Bind `navi` to <C-g>
@@ -60,10 +61,10 @@
 
   # Ship personal navi cheatsheets alongside the package so they
   # show up the first time `navi` is invoked. The file at
-  # `dotfiles/navi/welcome.yaml` is the source of truth — sync
-  # from the repo with `install/sync.ps1` and re-run
+  # `dotfiles/config/navi/welcome.yaml` is the source of truth — sync
+  # from the repo with `make restow` (or `install/sync.ps1`) and re-run
   # `home-manager switch` to refresh.
-  xdg.configFile."navi/welcome.yaml".source = ../../dotfiles/navi/welcome.yaml;
+  xdg.configFile."navi/welcome.yaml".source = ../../dotfiles/config/navi/welcome.yaml;
 
   # Better diff
   programs.broot = {

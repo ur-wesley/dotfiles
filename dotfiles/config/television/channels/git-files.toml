@@ -1,0 +1,16 @@
+# channels/git-files.toml — files tracked by git, sorted by recent change.
+# Bound to Ctrl+G in fish via `tv git-files`.
+
+[metadata]
+name = "git-files"
+description = "Fuzzy find git-tracked files (recent first)"
+requirements = ["git"]
+
+[source]
+command = "git ls-files"
+
+[preview]
+command = "git diff --color=always -- {1} | delta --color-only 2>/dev/null || cat {1}"
+
+[keybindings]
+select = ["enter"]

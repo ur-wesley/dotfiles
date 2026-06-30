@@ -1,0 +1,24 @@
+# Wesley's gitattributes — shared between home-manager and stow.
+# Mirrors .gitattributes at the repo root. Lines are referenced via
+# `attributesfile = ~/.config/git/attributes` in dotfiles/config/git/config.
+
+# Force LF for text files (Windows contributors otherwise get CRLF).
+*.sh        text eol=lf
+*.bash      text eol=lf
+*.nix       text eol=lf
+*.lua       text eol=lf
+*.toml      text eol=lf
+*.md        text eol=lf
+*.ps1       text eol=lf
+*.bat       text eol=lf
+
+# Binary files (no transformations).
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.ico       binary
+*.woff      binary
+*.woff2     binary
+*.ttf       binary
+*.otf       binary

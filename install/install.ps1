@@ -1,11 +1,10 @@
 # Wesley's dev environment installer for new Windows machines.
 #
-# This is a single-file portable installer. It installs everything
-# needed to get the same dev environment as the host machine, then
-# syncs the nix-config and Rio terminal config from a Git repo.
+# Single-file portable installer. Stow-driven dotfiles + NixOS-WSL.
+# Mirrors the omerxx/dotfiles structure: one tree, one install command.
 #
 # Usage (PowerShell, run as Administrator):
-#   iwr -useb https://raw.githubusercontent.com/<owner>/<repo>/main/install.ps1 | iex
+#   iwr -useb https://raw.githubusercontent.com/<owner>/<repo>/main/install/install.ps1 | iex
 #
 # Or, after downloading:
 #   .\install.ps1
@@ -17,24 +16,26 @@ param(
     [string]$Repo = "ur-wesley/dotfiles",
     [string]$Branch = "main",
     [string]$NixConfigDir = "$HOME\nix-config",
-    [switch]$SkipNixOS = $false,    # skip WSL NixOS install
-    [switch]$SkipRepos = $false,     # skip git clone/fetch
-    [switch]$SkipVSCode = $false,    # skip VS Code
-    [switch]$SkipFonts = $false,     # skip fonts
-    [switch]$Force = $false          # re-install everything
+    [switch]$SkipNixOS = $false,
+    [switch]$SkipRepos = $false,
+    [switch]$SkipVSCode = $false,
+    [switch]$SkipFonts = $false,
+    [switch]$SkipStow = $false,
+    [switch]$SkipWinget = $false,
+    [switch]$Force = $false
 )
 
 $ErrorActionPreference = "Stop"
 $ProgressPreference   = "SilentlyContinue"
 
-# ---- Pretty output -----------------------------------------------------
-function Step($msg)   { Write-Host "`n==> $msg" -ForegroundColor Cyan }
-function Ok($msg)     { Write-Host "  [OK] $msg" -ForegroundColor Green }
-function Warn($msg)   { Write-Host "  [WARN] $msg" -ForegroundColor Yellow }
-function Fail($msg)   { Write-Host "  [FAIL] $msg" -ForegroundColor Red }
-function Note($msg)   { Write-Host "  $msg" -ForegroundColor DarkGray }
+# ---- Pretty output ----------------------------------------------------
+function Step($msg) { Write-Host "`n==> $msg" -ForegroundColor Cyan }
+function Ok($msg)   { Write-Host "  [OK] $msg" -ForegroundColor Green }
+function Warn($msg) { Write-Host "  [WARN] $msg" -ForegroundColor Yellow }
+function Fail($msg) { Write-Host "  [FAIL] $msg" -ForegroundColor Red }
+function Note($msg) { Write-Host "  $msg" -ForegroundColor DarkGray }
 
-# ---- Preflight: Admin --------------------------------------------------
+# ---- Preflight: Admin -------------------------------------------------
 $principal = New-Object Security.Principal.WindowsPrincipal(
     [Security.Principal.WindowsIdentity]::GetCurrent())
 if (-not $principal.IsInRole(
@@ -43,12 +44,12 @@ if (-not $principal.IsInRole(
     exit 1
 }
 
-# ---- Preflight: winget -------------------------------------------------
-if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
+# ---- Preflight: winget ------------------------------------------------
+if (-not $SkipWinget -and -not (Get-Command winget -ErrorAction SilentlyContinue)) {
     Fail "winget is required. Install App Installer from the Microsoft Store."
     exit 1
 }
-Ok "winget found"
+if (-not $SkipWinget) { Ok "winget found" }
 
 # ---- Preflight: WSL ---------------------------------------------------
 if (-not $SkipNixOS) {
@@ -57,58 +58,103 @@ if (-not $SkipNixOS) {
         Fail "WSL is required. Run: wsl --install"
         exit 1
     }
-    Ok "wsl found"
+    Ok "WSL found"
 }
 
-# ---- Packages to install ---------------------------------------------
+# ---- winget packages --------------------------------------------------
+# Mirrors dotfiles/config/zellij (zellij default) + dotfiles/config/television
+# + home/wesley/cli-tools.nix. Modern Unix CLI stack so PowerShell outside
+# WSL feels like Linux.
 $wingetPackages = @(
+    # Dev environment
     @{ id = "Microsoft.PowerShell";         name = "PowerShell 7" },
     @{ id = "Microsoft.VisualStudioCode";    name = "VS Code"; skip = $SkipVSCode },
     @{ id = "GitHub.cli";                    name = "GitHub CLI" },
+    @{ id = "Git.Git";                       name = "Git" },
+    @{ id = "Docker.DockerDesktop";          name = "Docker Desktop" },
+
+    # Language runtimes (mise still owns per-project versions, but
+    # we install native ones for tooling outside WSL too).
     @{ id = "Schniz.fnm";                    name = "Fast Node Manager" },
     @{ id = "OpenJS.NodeJS.LTS";             name = "Node.js LTS" },
     @{ id = "GoLang.Go";                     name = "Go" },
     @{ id = "Rustlang.Rustup";               name = "Rust" },
     @{ id = "Python.Python.3.12";            name = "Python 3.12" },
     @{ id = "Microsoft.DotNet.SDK.9";        name = ".NET SDK 9" },
-    @{ id = "PostgreSQL.PostgreSQL.16";      name = "PostgreSQL 16" },
-    @{ id = "Git.Git";                       name = "Git" },
-    @{ id = "Docker.DockerDesktop";          name = "Docker Desktop" },
+
+    # Runtime manager
+    @{ id = "jdxcode.mise";                  name = "mise (runtime manager)" },
+
+    # Modern Unix CLI — fish-parity stack for PowerShell 7.
+    # See dotfiles/home/powershell/Microsoft.PowerShell_profile.ps1
+    @{ id = "gerardog.gsudo";                name = "gsudo (sudo for Windows)" },
+    @{ id = "BurntSushi.ripgrep";            name = "ripgrep" },
+    @{ id = "sharkdp.fd";                    name = "fd" },
+    @{ id = "sharkdp.bat";                   name = "bat" },
+    @{ id = "eza-community.eza";             name = "eza" },
+    @{ id = "jqlang.jq";                     name = "jq" },
+    @{ id = "junegunn.fzf";                  name = "fzf" },
+    @{ id = "ajeetdsouza.zoxide";            name = "zoxide" },
+    @{ id = "dandavison.delta";              name = "delta" },
+    @{ id = "starship.starship";             name = "starship" },
+    @{ id = "jesseduffield.lazygit";         name = "lazygit" },
+    @{ id = "jesseduffield.lazydocker";      name = "lazydocker" },
+    @{ id = "tldr-pages.tldr";               name = "tldr" },
+    @{ id = "denisidoro.navi";               name = "navi" },
+    @{ id = "atuinsh.atuin";                 name = "atuin" },
+
+    # File management
     @{ id = "7zip.7zip";                     name = "7-Zip" },
-    @{ id = "Notepad++.Notepad++";           name = "Notepad++" },
-    @{ id = "voidtools.Everything";           name = "Everything Search" },
-    @{ id = "jdxcode.mise";                   name = "mise (runtime manager, runs on Windows for use from PowerShell)" },
 )
 
-Step "Installing Windows packages via winget"
-$failed = @()
-foreach ($pkg in $wingetPackages) {
-    if ($pkg.skip) { Note "skip $($pkg.name)"; continue }
-    if (-not $Force) {
-        $installed = winget list --id $pkg.id 2>$null | Select-String $pkg.id
-        if ($installed) { Note "$($pkg.name) already installed"; continue }
+if (-not $SkipWinget) {
+    Step "Installing Windows packages via winget"
+    $failed = @()
+    foreach ($pkg in $wingetPackages) {
+        if ($pkg.skip) { Note "skip $($pkg.name)"; continue }
+        if (-not $Force) {
+            $installed = winget list --id $pkg.id 2>$null | Select-String $pkg.id
+            if ($installed) { Note "$($pkg.name) already installed"; continue }
+        }
+        Write-Host "  -> Installing $($pkg.name)..." -ForegroundColor DarkGray
+        $args = @("install", "--id", $pkg.id, "--silent", "--accept-source-agreements", "--accept-package-agreements")
+        $proc = Start-Process -FilePath "winget" -ArgumentList $args -NoNewWindow -PassThru -Wait
+        if ($proc.ExitCode -ne 0) {
+            Warn "Failed to install $($pkg.name) (winget exit $($proc.ExitCode))"
+            $failed += $pkg
+        } else {
+            Ok "Installed $($pkg.name)"
+        }
     }
-    Write-Host "  -> Installing $($pkg.name)..." -ForegroundColor DarkGray
-    $args = @("install", "--id", $pkg.id, "--silent", "--accept-source-agreements", "--accept-package-agreements")
-    $proc = Start-Process -FilePath "winget" -ArgumentList $args -NoNewWindow -PassThru -Wait
-    if ($proc.ExitCode -ne 0) {
-        Warn "Failed to install $($pkg.name) (winget exit $($proc.ExitCode))"
-        $failed += $pkg
-    } else {
-        Ok "Installed $($pkg.name)"
+    if ($failed.Count -gt 0) {
+        Warn "Failed packages: $($failed.name -join ', ')"
     }
-}
-if ($failed.Count -gt 0) {
-    Warn "Failed packages: $($failed.name -join ', ')"
 }
 
-# ---- Nerd Font ---------------------------------------------------------
+# ---- scoop + stow -----------------------------------------------------
+# Stow drives the dotfiles sync. Install via scoop so we have it on PATH.
+if (-not $SkipStow) {
+    Step "Installing GNU stow via scoop"
+    if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
+        Write-Host "  -> Installing scoop..." -ForegroundColor DarkGray
+        Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+        Invoke-RestMethod -Uri "https://get.scoop.sh" -UseBasicParsing | Invoke-Expression
+    }
+    if (Get-Command scoop -ErrorAction SilentlyContinue) {
+        scoop bucket add nerd-fonts 2>&1 | Out-Null
+        scoop install stow 2>&1 | Out-Null
+        Ok "stow installed"
+    } else {
+        Warn "scoop not available; install stow manually: scoop install stow"
+    }
+}
+
+# ---- Nerd Font --------------------------------------------------------
 if (-not $SkipFonts) {
     Step "Installing JetBrainsMono Nerd Font"
     if (-not (Test-Path "$env:LOCALAPPDATA\Microsoft\Windows\Fonts\JetBrainsMonoNerdFont-Regular.ttf")) {
         Write-Host "  -> Installing via scoop bucket nerd-fonts..." -ForegroundColor DarkGray
         if (Get-Command scoop -ErrorAction SilentlyContinue) {
-            scoop bucket add nerd-fonts 2>&1 | Out-Null
             scoop install JetBrainsMono-NF 2>&1 | Out-Null
             Ok "JetBrainsMono Nerd Font installed"
         } else {
@@ -119,7 +165,7 @@ if (-not $SkipFonts) {
     }
 }
 
-# ---- WSL NixOS install ------------------------------------------------
+# ---- WSL NixOS install -----------------------------------------------
 if (-not $SkipNixOS) {
     Step "Installing NixOS-WSL"
     $existing = wsl --list --quiet 2>&1 | Select-String "NixOS"
@@ -177,7 +223,7 @@ chsh -s "$(which fish)" wesley
     }
 }
 
-# ---- Clone nix-config -------------------------------------------------
+# ---- Clone nix-config ------------------------------------------------
 if (-not $SkipRepos) {
     Step "Cloning nix-config to $NixConfigDir"
     if (Test-Path $NixConfigDir) {
@@ -192,32 +238,49 @@ if (-not $SkipRepos) {
         git checkout $Branch
         Ok "nix-config cloned"
     }
+}
 
-    # Windows Terminal settings (only adds NixOS profile if missing)
-    Step "Patching Windows Terminal settings for NixOS"
-    $wtSettings = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
-    if (Test-Path $wtSettings) {
-        Copy-Item $wtSettings "$wtSettings.bak-$(Get-Date -Format 'yyyyMMdd-HHmmss')" -Force
-        $json = Get-Content $wtSettings -Raw | ConvertFrom-Json
-        $hasNix = $json.profiles.list | Where-Object { $_.name -eq "NixOS" -and -not $_.hidden } | Select-Object -First 1
-        if (-not $hasNix) {
-            Warn "NixOS profile not in Windows Terminal settings — please merge dotfiles/windows-terminal/settings.json manually"
+# ---- Stow dotfiles ---------------------------------------------------
+# Stow drops config/home into $HOME on Windows. Inside WSL, the same
+# files are reached via the bind-mount of C:\Users\parac\nix-config
+# (symlinked to ~/nix-config), and home-manager uses `xdg.configFile.source`
+# to symlink ~/.config/<x> at Nix-store copies of the same files.
+if (-not $SkipStow -and (Test-Path "$NixConfigDir\dotfiles")) {
+    Step "Stowing dotfiles"
+    Push-Location "$NixConfigDir\dotfiles"
+    if (Get-Command stow -ErrorAction SilentlyContinue) {
+        stow --target=$HOME --restow config home
+        Ok "dotfiles stowed into $HOME"
+    } else {
+        Warn "stow not on PATH; skipping. Run: cd $NixConfigDir\dotfiles && stow --restow config home"
+    }
+    Pop-Location
+}
+
+# ---- NixOS rebuild inside WSL ----------------------------------------
+if (-not $SkipNixOS -and -not $SkipRepos) {
+    Step "Applying nixos-rebuild inside WSL"
+    $wslStatus = wsl --list --verbose 2>&1 | Select-String "NixOS"
+    if ($wslStatus) {
+        wsl -d NixOS -u wesley -- bash -lc "cd ~ && sudo nixos-rebuild switch --flake ~/nix-config#nixos-wsl"
+        if ($LASTEXITCODE -eq 0) {
+            Ok "NixOS rebuild succeeded"
         } else {
-            Ok "Windows Terminal already has NixOS profile"
+            Warn "NixOS rebuild failed; check output above"
         }
     } else {
-        Warn "Windows Terminal settings.json not found; skip"
+        Warn "NixOS distro not registered; run this script with -SkipNixOS:`$false`"
     }
 }
 
-# ---- Done -------------------------------------------------------------
+# ---- Done ------------------------------------------------------------
 Step "Done. Next steps:"
-Write-Host "  1. Open Windows Terminal (the NixOS profile drops you into fish in WSL)" -ForegroundColor Green
-Write-Host "  2. Inside the WSL shell, run:" -ForegroundColor Green
-Write-Host "       sudo nixos-rebuild switch --flake ~$HOME_USER/nix-config#nixos-wsl" -ForegroundColor Green
-Write-Host "  3. After rebuild, the prompt + tools are live" -ForegroundColor Green
+Write-Host "  1. Open Windows Terminal — the NixOS profile drops you into fish in WSL" -ForegroundColor Green
+Write-Host "  2. From inside WSL, run 'zj' to start zellij (Catppuccin Mocha)" -ForegroundColor Green
+Write-Host "  3. Press Ctrl+F to open television (fuzzy file finder)" -ForegroundColor Green
+Write-Host "  4. Press Ctrl+G to open navi (cheatsheets)" -ForegroundColor Green
 Write-Host ""
-Write-Host "  Optional: VS Code extensions prune:" -ForegroundColor DarkGray
-Write-Host "       code --list-extensions | ForEach-Object { code --uninstall-extension `$_ }" -ForegroundColor DarkGray
+Write-Host "  Daily sync: cd $NixConfigDir\dotfiles && stow --restow config home" -ForegroundColor DarkGray
+Write-Host "  Inside WSL: cd ~/nix-config/dotfiles && make restow" -ForegroundColor DarkGray
 Write-Host ""
 Ok "All set. Welcome to the new box."

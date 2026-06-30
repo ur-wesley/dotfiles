@@ -1,8 +1,10 @@
-# Wesley's config sync — pulls latest nix-config and reapplies
-# Run from PowerShell as Administrator. Will:
+# Wesley's config sync — stow-driven, omerxx-style.
+# Run from PowerShell (no admin needed). Will:
 #   1. git pull in the nix-config repo
-#   2. Sync Rio + Windows Terminal + mise + navi configs
-#   3. Trigger nixos-rebuild inside the WSL distro
+#   2. stow --restow config home into $HOME (Windows-side)
+#   3. trigger nixos-rebuild inside WSL (Linux-side)
+#
+# Inside WSL, run: cd ~/nix-config/dotfiles && make restow && nrs
 
 [CmdletBinding()]
 param(
@@ -30,51 +32,30 @@ if (-not (Test-Path $NixConfigDir)) {
 }
 Ok "nix-config is on origin/$Branch"
 
-# 2. Windows Terminal (only if user wants to replace)
-Step "Checking Windows Terminal settings"
-$wtSettings = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
-if (Test-Path "$NixConfigDir\dotfiles\windows-terminal\settings.json") {
-    if (Test-Path $wtSettings) {
-        $existingJson = Get-Content $wtSettings -Raw | ConvertFrom-Json
-        $hasNix = $existingJson.profiles.list | Where-Object { $_.name -eq "NixOS" -and -not $_.hidden } | Select-Object -First 1
-        if ($hasNix) {
-            Ok "Windows Terminal already has NixOS profile (no action needed)"
-        } else {
-            Warn "NixOS profile not in Windows Terminal — see dotfiles/windows-terminal/settings.json"
-        }
+# 2. Stow Windows-side dotfiles
+Step "Stowing dotfiles into $HOME"
+$dotfilesDir = Join-Path $NixConfigDir "dotfiles"
+if (Test-Path $dotfilesDir) {
+    Push-Location $dotfilesDir
+    if (Get-Command stow -ErrorAction SilentlyContinue) {
+        stow --target=$HOME --restow config home
+        Ok "stow --restow config home → $HOME"
+    } else {
+        Warn "stow not on PATH. Install via: scoop install stow"
     }
+    Pop-Location
+} else {
+    Warn "$dotfilesDir not found; skipping stow"
 }
 
-# 2b. Rio config
-Step "Syncing Rio config"
-$rioDir = "$env:LOCALAPPDATA\rio"
-New-Item -ItemType Directory -Path $rioDir -Force | Out-Null
-Copy-Item "$NixConfigDir\dotfiles\rio\config.toml" "$rioDir\config.toml" -Force
-Ok "Rio config synced"
-
-# 2c. mise config (language runtimes via mise, not Nix)
-Step "Syncing mise config"
-$miseDir = "$env:USERPROFILE\.config\mise"
-New-Item -ItemType Directory -Path $miseDir -Force | Out-Null
-Copy-Item "$NixConfigDir\dotfiles\mise\config.toml" "$miseDir\config.toml" -Force
-Ok "mise config synced (run 'mise install' to pick up new tools)"
-
-# 2d. navi cheatsheets (Linux + Windows; navi merges them all)
-Step "Syncing navi cheatsheets"
-$naviDir = "$env:USERPROFILE\.config\navi"
-New-Item -ItemType Directory -Path $naviDir -Force | Out-Null
-if (Test-Path "$NixConfigDir\dotfiles\navi") {
-    Get-ChildItem -Path "$NixConfigDir\dotfiles\navi" -File | ForEach-Object {
-        Copy-Item $_.FullName -Destination $naviDir -Force
-    }
-}
-Ok "navi cheatsheets synced"
-
-# 3. NixOS rebuild inside WSL
-Step "Applying NixOS rebuild inside WSL"
+# 3. NixOS rebuild inside WSL (the Linux-side apply)
+Step "Applying nixos-rebuild inside WSL"
 $wslStatus = wsl --list --verbose 2>&1 | Select-String "NixOS"
 if ($wslStatus) {
-    wsl -d NixOS -u wesley -- bash -lc "cd ~ && sudo nixos-rebuild switch --flake ~/nix-config#nixos-wsl"
+    # Inside WSL, the dotfiles are reached via ~/nix-config (symlink to
+    # C:\Users\parac\nix-config). Home-manager uses xdg.configFile.source
+    # to read from dotfiles/config/* and rebuilds.
+    wsl -d NixOS -u wesley -- bash -lc "cd ~/nix-config/dotfiles && make restow && cd ~ && sudo nixos-rebuild switch --flake ~/nix-config#nixos-wsl"
     if ($LASTEXITCODE -eq 0) {
         Ok "NixOS rebuild succeeded"
     } else {
@@ -85,3 +66,7 @@ if ($wslStatus) {
 }
 
 Ok "Sync complete. Restart your terminal to pick up changes."
+Write-Host ""
+Write-Host "  Inside WSL, the daily workflow is:" -ForegroundColor DarkGray
+Write-Host "    cd ~/nix-config/dotfiles && make restow" -ForegroundColor DarkGray
+Write-Host "    nrs                                            # rebuild nix" -ForegroundColor DarkGray

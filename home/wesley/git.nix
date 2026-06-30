@@ -12,138 +12,24 @@
     commitlint
   ];
 
-  programs.git = {
-    enable = true;
-    package = pkgs.git;
+  # Source the shared git config from dotfiles/config/git/config so home-manager
+  # (WSL) and stow (Windows) share one file. Home-manager creates
+  # ~/.config/git/config as a symlink to a Nix store copy of the file.
+  # Identity lives in the shared file (no per-host override for now).
+  xdg.configFile."git/config".source = ../../dotfiles/config/git/config;
 
-    settings = {
-      # Identity
-      user = {
-        name = "Wesley";
-        email = "wesley@local";
-      };
+  # Global gitignore sourced from dotfiles/config/git/ignore.
+  home.file.".config/git/ignore".source = ../../dotfiles/config/git/ignore;
 
-      # Core
-      init.defaultBranch = "main";
-      core = {
-        pager = "delta";
-        editor = "nvim";
-        whitespace = "fix,-indent-with-non-tab,trailing-space,cr-at-eol";
-        autocrlf = "input";
-        safecrlf = "warn";
-        excludesfile = "~/.config/git/ignore";
-        attributesfile = "~/.config/git/attributes";
-        hooksPath = "~/.config/git/hooks";
-      };
+  # gitattributes sourced from dotfiles/config/git/attributes.
+  home.file.".config/git/attributes".source = ../../dotfiles/config/git/attributes;
 
-      # Pull / push
-      pull = {
-        rebase = true;
-        ff = "only";
-      };
-      push = {
-        autoSetupRemote = true;
-        default = "current";
-      };
+  # We do NOT use programs.git here — settings come entirely from the
+  # shared config file. Home-manager would otherwise generate a parallel
+  # ~/.config/git/config and conflict with the xdg.configFile symlink.
+  # The git package itself is provided via home.packages above.
 
-      # Diff / merge
-      diff = {
-        algorithm = "histogram";
-        renames = true;
-        colorMoved = "zebra";
-        mnemonicPrefix = true;
-      };
-      merge = {
-        tool = "nvim";
-        conflictstyle = "zdiff3";
-      };
-      rerere = {
-        enabled = true;
-        autoupdate = true;
-      };
-
-      # Branch
-      branch = {
-        sort = "-committerdate";
-      };
-
-      # Log
-      log = {
-        date = "iso";
-      };
-
-      # Delta
-      add = {
-        interactive = {
-          diffFilter = "delta --color-only --color-moved";
-        };
-      };
-
-      # Aliases (in addition to shell aliases)
-      alias = {
-        co = "checkout";
-        br = "branch";
-        ci = "commit";
-        st = "status";
-        unstage = "reset HEAD --";
-        last = "log -1 HEAD";
-        visual = "!gitk";
-        lg = "log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit";
-        lgp = "log --stat --patch";
-        type = "cat-file -t";
-        cleanup = "!git clean -dfx && git reset --hard";
-        amend = "commit --amend --no-edit";
-        undo = "reset --soft HEAD~1";
-        wip = "commit -am \"WIP\"";
-        unwip = "reset --soft HEAD~1";
-        contribute = "shortlog -s -n --all --no-merges";
-        ranked = "shortlog -s -n --all";
-      };
-
-      # URL rewrites — disabled: we use gh's HTTPS credential helper instead of SSH.
-      # url = {
-      #   "git@github.com:" = {
-      #     insteadOf = "https://github.com/";
-      #   };
-      # };
-    };
-
-    # Global gitignore
-    ignores = [
-      "*.swp"
-      "*.swo"
-      "*~"
-      ".DS_Store"
-      "Thumbs.db"
-      "*.tmp"
-      "*.bak"
-      "*.orig"
-      ".idea/"
-      ".vscode/"
-      "node_modules/"
-      "dist/"
-      "build/"
-      "target/"
-      ".next/"
-      ".nuxt/"
-      ".svelte-kit/"
-      ".cache/"
-      ".parcel-cache/"
-      "coverage/"
-      "*.log"
-      ".env"
-      ".env.local"
-      ".env.*.local"
-      ".DS_Store"
-      "*.pyc"
-      "__pycache__/"
-      ".mypy_cache/"
-      ".pytest_cache/"
-      ".ruff_cache/"
-    ];
-  };
-
-  # Delta pager config
+  # Delta pager config (Catppuccin Mocha)
   programs.delta = {
     enable = true;
     enableGitIntegration = true;
@@ -166,7 +52,6 @@
       side-by-side = true;
       syntax-theme = "Catppuccin Mocha";
       pager = "less --mouse --wheel-lines=3 --quit-on-intr";
-      # Catppuccin Mocha for dark, OneHalfLight for light
       dark = "Catppuccin Mocha";
       light = "Catppuccin Latte";
     };

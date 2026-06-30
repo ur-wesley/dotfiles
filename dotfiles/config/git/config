@@ -1,0 +1,111 @@
+# Wesley's git config — shared between home-manager (Nix) and stow (Windows).
+# Managed by home-manager on WSL; synced by stow on Windows.
+# Do not edit by hand while a rebuild is running.
+
+[user]
+	name = Wesley
+	email = wes.urb@gmail.com
+
+[init]
+	defaultBranch = main
+
+[core]
+	pager = delta
+	editor = nvim
+	whitespace = fix,-indent-with-non-tab,trailing-space,cr-at-eol
+	autocrlf = input
+	safecrlf = warn
+	excludesfile = ~/.config/git/ignore
+	attributesfile = ~/.config/git/attributes
+	hooksPath = ~/.config/git/hooks
+
+[pull]
+	rebase = true
+	ff = only
+
+[push]
+	autoSetupRemote = true
+	default = current
+
+[diff]
+	algorithm = histogram
+	renames = true
+	colorMoved = zebra
+	mnemonicPrefix = true
+
+[merge]
+	tool = nvim
+	conflictstyle = zdiff3
+
+[rerere]
+	enabled = true
+	autoupdate = true
+
+[branch]
+	sort = -committerdate
+
+[log]
+	date = iso
+
+[add "interactive"]
+	diffFilter = delta --color-only --color-moved
+
+[alias]
+	co = checkout
+	br = branch
+	ci = commit
+	st = status
+	unstage = reset HEAD --
+	last = log -1 HEAD
+	visual = !gitk
+	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+	lgp = log --stat --patch
+	type = cat-file -t
+	cleanup = !git clean -dfx && git reset --hard
+	amend = commit --amend --no-edit
+	undo = reset --soft HEAD~1
+	wip = commit -am "WIP"
+	unwip = reset --soft HEAD~1
+	contribute = shortlog -s -n --all --no-merges
+	ranked = shortlog -s -n --all
+
+# URL rewrites intentionally omitted — we use gh's HTTPS credential helper.
+
+[delta]
+	features = diff-highlight line-numbers decorations
+	dark = Catppuccin Mocha
+	light = Catppuccin Latte
+	side-by-side = true
+	syntax-theme = Catppuccin Mocha
+	pager = less --mouse --wheel-lines=3 --quit-on-intr
+
+[delta "decorations"]
+	commit-decoration-style = bold yellow box ul
+	file-decoration-style = none
+	file-style = bold yellow
+
+[delta "line-numbers"]
+	line-numbers-left-format = "  "
+	line-numbers-right-format = "  ›"
+	line-numbers-minus-style = red
+	line-numbers-plus-style = green
+
+[delta "navigate"]
+	n = true
+
+[interactive]
+	diffFilter = delta --color-only
+
+[pager]
+	blame = delta
+	diff = delta
+	log = delta
+	show = delta
+
+[credential "https://github.com"]
+	helper = ""
+	helper = gh auth git-credential
+
+[credential "https://gist.github.com"]
+	helper = ""
+	helper = gh auth git-credential

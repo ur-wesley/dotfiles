@@ -1,0 +1,116 @@
+// Wesley's zellij Catppuccin Mocha theme — palette matches
+// dotfiles/config/rio/config.toml and dotfiles/config/windows-terminal/settings.json.
+// Theme name matches the file basename without extension.
+
+themes {
+    catppuccin-mocha {
+        // Base 16 — Catppuccin Mocha standard
+        base00 "#1e1e2e"  // base (bg)
+        base01 "#181825"  // mantle
+        base02 "#313244"  // surface0
+        base03 "#45475a"  // surface1
+        base04 "#585b70"  // surface2
+        base05 "#cdd6f4"  // text
+        base06 "#f5e0dc"  // rosewater
+        base07 "#bac2de"  // subtext1
+        base08 "#f38ba8"  // red
+        base09 "#fab387"  // peach
+        base0A "#f9e2af"  // yellow
+        base0B "#a6e3a1"  // green
+        base0C "#94e2d5"  // teal
+        base0D "#89b4fa"  // blue
+        base0E "#cba6f7"  // mauve (lavender — accents)
+        base0F "#f2cdcd"  // flamingo
+
+        // Tab bar at the bottom
+        ribbon {
+            bg "#1e1e2e"
+            fg "#cdd6f4"
+            selected_bg "#cba6f7"
+            selected_fg "#1e1e2e"
+        }
+
+        // Status bar (bottom)
+        status {
+            bg "#181825"
+            fg "#cdd6f4"
+            active_pane_bg "#1e1e2e"
+            active_pane_fg "#cba6f7"
+        }
+
+        // Pane frames around focused/unfocused panes
+        frames {
+            frame "#313244"
+            frame_focused "#cba6f7"
+            frame_unfocused "#45475a"
+        }
+
+        // Mode indicators (Normal / Locked / Pane / Tab / etc.)
+        mode {
+            normal {
+                bg "#cba6f7"
+                fg "#1e1e2e"
+            }
+            locked {
+                bg "#f9e2af"
+                fg "#1e1e2e"
+            }
+            resize {
+                bg "#89b4fa"
+                fg "#1e1e2e"
+            }
+            pane {
+                bg "#a6e3a1"
+                fg "#1e1e2e"
+            }
+            tab {
+                bg "#fab387"
+                fg "#1e1e2e"
+            }
+            scroll {
+                bg "#94e2d5"
+                fg "#1e1e2e"
+            }
+            enter_search {
+                bg "#f5c2e7"
+                fg "#1e1e2e"
+            }
+            search {
+                bg "#f38ba8"
+                fg "#1e1e2e"
+            }
+            rename_tab {
+                bg "#f9e2af"
+                fg "#1e1e2e"
+            }
+            rename_pane {
+                bg "#f9e2af"
+                fg "#1e1e2e"
+            }
+            session {
+                bg "#cba6f7"
+                fg "#1e1e2e"
+            }
+            move {
+                bg "#fab387"
+                fg "#1e1e2e"
+            }
+            prompt {
+                bg "#a6e3a1"
+                fg "#1e1e2e"
+            }
+            tmux {
+                bg "#89b4fa"
+                fg "#1e1e2e"
+            }
+        }
+
+        // Multi-screen session picker (Ctrl+o w)
+        session {
+            bg "#1e1e2e"
+            fg "#cdd6f4"
+            selected_bg "#cba6f7"
+            selected_fg "#1e1e2e"
+        }
+    }
+}

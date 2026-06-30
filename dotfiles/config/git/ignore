@@ -1,0 +1,33 @@
+# Wesley's global gitignore — shared between home-manager and stow.
+# Lines mirror home/wesley/git.nix `programs.git.ignores`.
+
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+*.tmp
+*.bak
+*.orig
+.idea/
+.vscode/
+node_modules/
+dist/
+build/
+target/
+.next/
+.nuxt/
+.svelte-kit/
+.cache/
+.parcel-cache/
+coverage/
+*.log
+.env
+.env.local
+.env.*.local
+.DS_Store
+*.pyc
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/

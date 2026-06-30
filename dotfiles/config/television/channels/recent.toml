@@ -1,0 +1,16 @@
+# channels/recent.toml — recent directories via zoxide.
+# Bound via `tv recent`.
+
+[metadata]
+name = "recent"
+description = "Recently visited directories (zoxide)"
+requirements = ["zoxide"]
+
+[source]
+command = "zoxide query --list | head -100"
+
+[preview]
+command = "ls -la {1} | head -30"
+
+[keybindings]
+select = ["enter"]
