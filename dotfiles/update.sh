@@ -144,6 +144,11 @@ cat <<'EOF'
 
   Starship + zellij + tv configs are now live (open a new shell to see).
 
+  IMPORTANT: if you were inside a zellij session, the new config
+  (default_shell fish, default_terminal alacritty, pane_frames false)
+  does NOT apply to that session — only to NEW sessions.
+  Run: zellij kill-all-sessions -y  (then zj to re-attach)
+
   Windows-side changes (Rio, Windows Terminal, PowerShell profile) need:
     PowerShell> stow --restow config home
   Or just run install/sync.ps1 — it does stow + nixos-rebuild together.
