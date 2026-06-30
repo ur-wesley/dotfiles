@@ -1,28 +1,26 @@
-# Wesley's starship config — Catppuccin Mocha, rounded pills.
+# Wesley's starship config — Catppuccin Mocha with full background chips.
 # Shared between home-manager (Nix) and stow (Windows).
 # Literal $ characters are intentional — starship uses them for module
 # references. Don't escape them.
+#
+# Chip design:
+#   - Each module renders as `[ text ](bg:accent fg:text)` — a filled block
+#     with bracket characters rendered as solid powerline separators when
+#     a Nerd Font is active, creating the rounded "chip" appearance.
+#   - Catppuccin Mocha accents for backgrounds, dark text for contrast.
 
 "$schema" = "https://starship.rs/config-schema.json"
 command_timeout = 1000
 scan_timeout = 5000
 continuation_prompt = "[▸▸](bold blue)"
 
-# Top-level: just the prompt arrow + identity + cwd on the left.
-# Git + language stack + time all live on the right edge.
-# The `(`/`)` and `·` characters inside each module's `format`
-# give the prompt its rounded, pill-like look.
-format = """$character$username$hostname$directory"""
-
-# Right edge: git status → language stack → time chip.
-# Each module is a separate "chip" with its own Catppuccin Mocha color.
+# Left: identity chips (character → username → host → cwd).
+# Right: status chips (git → languages → time).
+format = """$character$username$hostname$directory """
 right_format = """$git_branch$git_status$nodejs$rust$python$java$kotlin$ruby$php$golang $time """
 
-# --- Prompt arrow ----------------------------------------------
-# NOTE: starship 1.25 removed the bare `symbol` and `style` keys
-# from [character]. The arrow is now `success_symbol` /
-# `error_symbol` / `vimcmd_*_symbol`, and color is applied via
-# starship's own `[...](style)` syntax in `format`.
+# --- Prompt arrow chip ------------------------------------------
+# Lavender chip with dark text — the visible prompt character.
 [character]
 success_symbol = "❯"
 error_symbol = "❯"
@@ -30,44 +28,49 @@ vimcmd_symbol = "❮"
 vimcmd_visual_symbol = "❮"
 vimcmd_replace_symbol = "❮"
 vimcmd_replace_one_symbol = "❮"
-format = "[$symbol](bold #cba6f7) "
+style = "bg:#cba6f7 fg:#1e1e2e bold"
+format = "[ $symbol ]($style) "
 disabled = false
 
-# --- Identity --------------------------------------------------
-# Note: starship's style system only kicks in on `[text](style)`,
-# so the parentheses are baked into the content (as literal chars)
-# and the brackets carry the style group.
+# --- Username chip ---------------------------------------------
+# Surface1 background, pink foreground. Root user gets a red chip.
 [username]
-style_user = "bold #f5c2e7"
-style_root = "bold #f38ba8"
-format = "[($user)]($style) "
+style_user = "bg:#45475a fg:#f5c2e7 bold"
+style_root = "bg:#f38ba8 fg:#1e1e2e bold"
+format = "[ $user ]($style) "
 show_always = true
 disabled = false
 
+# --- Hostname chip ---------------------------------------------
+# Surface1 background, teal foreground.
 [hostname]
 ssh_only = false
-style = "bold #94e2d5"
-format = "·[@($hostname)]($style) "
+style = "bg:#45475a fg:#94e2d5 bold"
+format = "[@ $hostname ]($style) "
 disabled = false
 
-# --- Location --------------------------------------------------
+# --- Directory chip --------------------------------------------
+# Blue background, dark foreground. Path fills the chip.
 [directory]
-style = "bold #89b4fa"
-format = "·[($path)]($style) "
+style = "bg:#89b4fa fg:#1e1e2e bold"
+format = "[ $path ]($style) "
 truncation_length = 3
 truncation_symbol = "…/"
 home_symbol = "~"
 read_only = " 🔒"
 
-# --- Git --------------------------------------------------------
+# --- Git branch chip -------------------------------------------
+# Peach background, dark foreground.
 [git_branch]
 symbol = " "
-style = "bold #fab387"
-format = "·[git:($symbol$branch(:$remote_branch))]($style) "
+style = "bg:#fab387 fg:#1e1e2e bold"
+format = "[$symbol$branch]($style) "
 
+# --- Git status chip -------------------------------------------
+# Red background when there are changes, dark foreground.
 [git_status]
-style = "bold #f38ba8"
-format = "[($all_status$ahead_behind)]($style) "
+style = "bg:#f38ba8 fg:#1e1e2e bold"
+format = "[$all_status$ahead_behind]($style) "
 modified = "!"
 staged = "+"
 renamed = "»"
@@ -77,51 +80,54 @@ ahead = "⇡${count}"
 behind = "⇣${count}"
 diverged = "⇕±${count}"
 
-# --- Languages --------------------------------------------------
+# --- Language stack chips --------------------------------------
+# Each language gets its own Catppuccin Mocha accent.
+
 [nodejs]
-symbol = "⬢"
-style = "bold #a6e3a1"
-format = "·[($symbol $version)]($style) "
+symbol = "⬢ "
+style = "bg:#a6e3a1 fg:#1e1e2e bold"
+format = "[$symbol$version]($style) "
 
 [rust]
-symbol = "🦀"
-style = "bold #fab387"
-format = "·[($symbol $version)]($style) "
+symbol = "🦀 "
+style = "bg:#fab387 fg:#1e1e2e bold"
+format = "[$symbol$version]($style) "
 
 [golang]
-symbol = "go"
-style = "bold #94e2d5"
-format = "·[($symbol $version)]($style) "
+symbol = "go "
+style = "bg:#94e2d5 fg:#1e1e2e bold"
+format = "[$symbol$version]($style) "
 
 [python]
-symbol = "py"
-style = "bold #f9e2af"
-format = "·[($symbol $version)]($style) "
+symbol = "py "
+style = "bg:#f9e2af fg:#1e1e2e bold"
+format = "[$symbol$version]($style) "
 
 [java]
-symbol = "☕"
-style = "bold #f38ba8"
-format = "·[($symbol $version)]($style) "
+symbol = "☕ "
+style = "bg:#f38ba8 fg:#1e1e2e bold"
+format = "[$symbol$version]($style) "
 
 [kotlin]
-symbol = "🟪"
-style = "bold #b4befe"
-format = "·[($symbol $version)]($style) "
+symbol = "🟪 "
+style = "bg:#b4befe fg:#1e1e2e bold"
+format = "[$symbol$version]($style) "
 
 [ruby]
-symbol = "💎"
-style = "bold #f38ba8"
-format = "·[($symbol $version)]($style) "
+symbol = "💎 "
+style = "bg:#f38ba8 fg:#1e1e2e bold"
+format = "[$symbol$version]($style) "
 
 [php]
-symbol = "🐘"
-style = "bold #b4befe"
-format = "·[($symbol $version)]($style) "
+symbol = "🐘 "
+style = "bg:#b4befe fg:#1e1e2e bold"
+format = "[$symbol$version]($style) "
 
-# --- Time (right edge) -----------------------------------------
+# --- Time chip (rightmost, always visible) --------------------
+# Red chip — pops against the Catppuccin Mocha palette.
 [time]
-style = "bold #f38ba8"
-format = "[$time]($style)"
+style = "bg:#f38ba8 fg:#1e1e2e bold"
+format = "[ $time ]($style)"
 time_format = "%R"
 disabled = false
 
