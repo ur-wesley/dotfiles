@@ -262,9 +262,14 @@
       end
 
       # Auto-launch zellij on login shells (SSH, fresh WSL window).
-      # Skip if we are already inside a zellij session.
-      if set -q ZELLIJ_SESSION_NAME
-        # already inside a zellij session, nothing to do
+      # Critical: skip when zellij itself spawned this shell, otherwise
+      # every new zellij tab recursively tries to attach → new tab kills
+      # itself. zellij sets ZELLIJ_PANE_ID in every spawned shell, so
+      # checking for that (or ZELLIJ_SESSION_NAME) is the safe gate.
+      if set -q ZELLIJ_PANE_ID
+        # already inside a zellij pane — don't auto-launch
+      else if set -q ZELLIJ_SESSION_NAME
+        # also already inside zellij, skip
       else if command -v zellij >/dev/null
         set -l s (zellij list-sessions --short 2>/dev/null | string collect)
         if test -n "$s"
