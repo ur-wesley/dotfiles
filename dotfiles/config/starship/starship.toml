@@ -26,37 +26,39 @@ palette = 'catppuccin_mocha'
 # LEFT: directory (cwd) → username → host → character
 # RIGHT: git_branch → git_status → languages → time
 #
-# Each line ends with `\` (multi-line literal). Between modules,
-# `[](fg:prev_bg bg:next_bg)` is a powerline transition arrow —
-# starship draws a "▸" in `next_bg` to bridge from the previous
-# chip's color to the next.
+# Each line ends with `\` (multi-line literal). Between modules:
+#   ` `              — visible space (visual padding between pills)
+#   `[](fg:X bg:Y)`  — powerline transition arrow in `bg:Y` color
+#
+# The space-after-arrow is what gives the "separated, floating pill"
+# look — each chip stands on its own with breathing room around it.
 format = """
 $directory\
-[](fg:green bg:maroon)\
-$username\
-[](fg:maroon bg:peach)\
-$hostname\
-[](fg:peach bg:mauve)\
-$character\
-[](fg:mauve)"""
+ [](fg:green bg:maroon)\
+ $username\
+ [](fg:maroon bg:peach)\
+ $hostname\
+ [](fg:peach bg:mauve)\
+ $character\
+ [](fg:mauve)"""
 
 right_format = """
-[](fg:maroon bg:yellow)\
-$git_branch\
-[](fg:yellow bg:red)\
-$git_status\
-[](fg:red bg:sapphire)\
-$nodejs\
-$rust\
-$python\
-$golang\
-$java\
-$kotlin\
-$ruby\
-$php\
-[](fg:sapphire bg:lavender)\
-$time\
-[](fg:lavender)"""
+ [](fg:maroon bg:yellow)\
+ $git_branch\
+ [](fg:yellow bg:red)\
+ $git_status\
+ [](fg:red bg:sapphire)\
+ $nodejs\
+ $rust\
+ $python\
+ $golang\
+ $java\
+ $kotlin\
+ $ruby\
+ $php\
+ [](fg:sapphire bg:lavender)\
+ $time\
+ [](fg:lavender)"""
 
 # --- Prompt arrow (left side, mauve chip) -------------------------
 [character]
