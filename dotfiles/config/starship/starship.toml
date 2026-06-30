@@ -8,14 +8,15 @@ command_timeout = 1000
 scan_timeout = 5000
 continuation_prompt = "[▸▸](bold blue)"
 
-# Top-level: just concatenate modules; each module styles itself.
+# Top-level: just the prompt arrow + identity + cwd on the left.
+# Git + language stack + time all live on the right edge.
 # The `(`/`)` and `·` characters inside each module's `format`
 # give the prompt its rounded, pill-like look.
-format = """$character$username$hostname$directory$git_branch$git_status$nodejs$rust$python$java$kotlin$ruby$php$golang"""
+format = """$character$username$hostname$directory"""
 
-# Time on the right edge of the terminal, kept on the same line
-# as the rest of the prompt.
-right_format = """ [$time]($style) """
+# Right edge: git status → language stack → time chip.
+# Each module is a separate "chip" with its own Catppuccin Mocha color.
+right_format = """$git_branch$git_status$nodejs$rust$python$java$kotlin$ruby$php$golang $time """
 
 # --- Prompt arrow ----------------------------------------------
 # NOTE: starship 1.25 removed the bare `symbol` and `style` keys

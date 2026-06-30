@@ -1,0 +1,153 @@
+# Wesley's Rio config — Catppuccin Mocha dark with blur, JetBrainsMono Nerd Font,
+# larger font, better copy/paste defaults. Rio is the optional daily-driver terminal
+# on Windows (Zellij runs inside WSL on any terminal).
+# Docs: https://rioterm.com/docs/config
+
+[developer]
+log-level = "DEBUG"
+enable-log-file = true
+
+# ---- Window ----------------------------------------------------------
+# Glass/blur background with a touch of transparency — the Catppuccin
+# Mocha base color shows through any desktop wallpaper.
+[window]
+width = 1280
+height = 820
+opacity = 0.85
+blur = true
+decorations = "Transparent"
+# Top padding leaves room for the tab strip when 2+ tabs are open.
+# Bottom/sides are 0 so the terminal uses the full window.
+padding = [10, 0, 0, 0]
+
+# No inner panel margin/padding — the terminal content fills the panel.
+# Default values (2px margin, 5px padding) were eating ~14px of vertical
+# space on top of the outer window padding.
+[panel]
+margin = [0]
+padding = [0]
+
+# ---- Fonts -----------------------------------------------------------
+# JetBrainsMono Nerd Font — has ligatures and the Nerd Font icon set.
+# Size bumped from 12 to 14 for better readability on hi-DPI displays.
+[fonts]
+size = 14.0
+
+[fonts.regular]
+family = "JetBrainsMono Nerd Font"
+style = "Regular"
+
+[fonts.bold]
+family = "JetBrainsMono Nerd Font"
+style = "Bold"
+
+[fonts.italic]
+family = "JetBrainsMono Nerd Font"
+style = "Italic"
+
+[fonts.bold-italic]
+family = "JetBrainsMono Nerd Font"
+style = "Bold Italric"
+
+# Hide the mouse cursor while typing, but keep selection behavior explicit.
+hide-mouse-cursor-when-typing = true
+
+# ---- Copy / Paste ----------------------------------------------------
+# Default is copy-on-select=false. We flip to true so highlighting text
+# automatically puts it on the clipboard — matches modern terminal UX.
+# Right-click pastes from the clipboard on Windows; on Linux it's middle-click.
+copy-on-select = true
+
+# Selection padding — pixels of margin around the selection bounding box.
+# Larger values are easier to grab; smaller is more precise.
+selection-fg = "#1e1e2e"
+selection-bg = "#f5c2e7"
+
+# Search and keybindings for explicit paste/copy operations.
+[key_bindings]
+# Ctrl+Shift+C copies the selected text (or the whole line if no selection).
+# Ctrl+Shift+V pastes from the clipboard.
+# Rio's defaults already match these on Windows; declared explicitly for clarity.
+
+# ---- Mouse -----------------------------------------------------------
+# Right-click paste is the convention on Windows. Rio handles this via
+# `paste-on-right-click` (true by default; declared for documentation).
+paste-on-right-click = true
+
+# ---- Navigation ------------------------------------------------------
+[navigation]
+mode = "Tab"
+hide-if-single = true
+use-split = true
+unfocused-split-opacity = 0.7
+
+# ---- Scroll ----------------------------------------------------------
+[scroll]
+multiplier = 3.0
+divider = 1.0
+
+# ---- Cursor ----------------------------------------------------------
+[cursor]
+shape = "block"
+blinking = false
+blinking-interval = 800
+
+# ---- Bell ------------------------------------------------------------
+[bell]
+visual = true
+audio = false
+
+# ---- Editor (Ctrl+Shift+E opens in VS Code) --------------------------
+[editor]
+program = "code"
+args = []
+
+# ---- Shell -----------------------------------------------------------
+# Drop into fish inside WSL by default. Switch the entire WSL distro
+# name if you change distros.
+[shell]
+program = "wsl.exe"
+args = ["-d", "NixOS", "--", "fish", "-l"]
+
+# ---- Colors (Catppuccin Mocha) ---------------------------------------
+# Set explicitly (theme = "catppuccin-mocha" also works, but explicit
+# gives full control over the tab bar palette).
+[colors]
+background       = "#1e1e2e"
+foreground       = "#cdd6f4"
+
+cursor           = "#f5e0dc"
+cursor-text      = "#1e1e2e"
+
+selection        = "#45475a"
+selection-text   = "#cdd6f4"
+
+# ANSI palette — Catppuccin Mocha
+black            = "#45475a"
+red              = "#f38ba8"
+green            = "#a6e3a1"
+yellow           = "#f9e2af"
+blue             = "#89b4fa"
+magenta          = "#f5c2e7"
+cyan             = "#94e2d5"
+white            = "#bac2de"
+
+bright-black     = "#585b70"
+bright-red       = "#f38ba8"
+bright-green     = "#a6e3a1"
+bright-yellow    = "#f9e2af"
+bright-blue      = "#89b4fa"
+bright-magenta   = "#f5c2e7"
+bright-cyan      = "#94e2d5"
+bright-white     = "#a6adc8"
+
+# Tab bar — brightened so it's visible on the dark background.
+# Default catppuccin-mocha theme has no `tabs` entry, so Rio falls back
+# to #cccccc on dark — barely visible.
+tabs             = "#cba6f7"
+tabs-active      = "#1e1e2e"  # text color on the active (lavender) tab
+
+# Misc UI elements
+scrollbar        = "#45475a"
+scrollbar-thumb  = "#585b70"
+increase-contrast = false
