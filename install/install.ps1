@@ -70,10 +70,7 @@ $wingetPackages = @(
     @{ id = "Git.Git";                       name = "Git" },
     @{ id = "Docker.DockerDesktop";          name = "Docker Desktop" },
 
-    # .NET (not mise-managed)
-    @{ id = "Microsoft.DotNet.SDK.9";        name = ".NET SDK 9" },
-
-    # Runtime manager (node, python, go, rust, bun, etc.)
+    # Runtime manager (node, python, go, rust, dotnet, bun, etc.)
     @{ id = "jdxcode.mise";                  name = "mise (runtime manager)" },
 
     # Terminals — WezTerm (Catppuccin Mocha, blur) is the GPU-accelerated
