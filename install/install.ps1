@@ -105,7 +105,7 @@ $wingetPackages = @(
     @{ id = "atuinsh.atuin";                 name = "atuin" },
 
     # File management
-    @{ id = "7zip.7zip";                     name = "7-Zip" },
+    @{ id = "7zip.7zip";                     name = "7-Zip" }
 )
 
 if (-not $SkipWinget) {
