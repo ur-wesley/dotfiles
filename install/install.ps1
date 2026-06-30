@@ -6,9 +6,6 @@
 # Usage (PowerShell, run as Administrator):
 #   irm https://raw.githubusercontent.com/<owner>/<repo>/main/install/install.ps1 -OutFile $env:TEMP\install.ps1; & $env:TEMP\install.ps1
 #
-# Or, after downloading:
-#   .\install.ps1   (edit the variables below to customize)
-#
 # Requirements: Windows 10/11, internet, ~30 GB free disk.
 
 [CmdletBinding()]
