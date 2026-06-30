@@ -38,13 +38,19 @@ local mocha = {
 }
 
 -- ---- Window -----------------------------------------------------------
--- Match Rio: 1280x820 area, transparent w/ blur. On Windows 11 the OS
--- (DWM) applies acrylic blur automatically when window_background_opacity
--- is < 1.0; window_background_blur is a no-op there but kept for parity
--- with macOS / Linux blur. opacity=0.78 + blur=35 = strong frosted-glass.
+-- Match Rio: 1280x820 area, transparent w/ blur.
+--
+-- Frosted glass is per-platform in WezTerm:
+--   * Windows: win32_system_backdrop = "Acrylic"  (Win 10/11 DWM acrylic)
+--              — needs window_background_opacity < 1.0 to be visible
+--   * macOS:   macos_window_background_blur = 35  (integer pixel radius)
+-- There is no cross-platform `window_background_blur`; setting it is a
+-- hard error. 0.78 opacity + Acrylic = strong frosted-glass on Win.
 config.window_decorations = 'RESIZE'        -- clean borderless title bar
 config.window_background_opacity = 0.78     -- stronger frost: more desktop
-config.window_background_blur = 35          -- visible through the panel
+                                              -- shows through
+config.win32_system_backdrop = 'Acrylic'    -- Win 10/11 DWM blur
+config.macos_window_background_blur = 35    -- macOS blur radius (px)
 config.window_corner_radius = 12            -- Win11 rounded corners
                                               -- (matches Rio's rounded bg)
 
