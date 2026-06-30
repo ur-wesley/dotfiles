@@ -1,7 +1,7 @@
-# Wesley's starship config — omerxx-style minimal.
-# Layout: minimal left prompt ($directory + $character), everything else
-# on the right via $all. Catppuccin Mocha palette + per-module chip
-# styling for that "rounded pill" look.
+# Wesley's starship config — omerxx-style.
+# Layout: minimal left prompt (just $directory + $character), everything
+# else on the right via $all. Catppuccin Mocha palette referenced by
+# name throughout.
 #
 # Inspired by https://github.com/omerxx/dotfiles
 # Apply changes from WSL: ~/nix-config/dotfiles/update.sh
@@ -15,55 +15,46 @@ continuation_prompt = "[▸▸](bold blue)"
 
 palette = "catppuccin_mocha"
 
-# Minimal left prompt — just the cwd and the prompt character.
-# This is omerxx's signature: keep the left side empty, push
+# Minimal left prompt — directory chip + plain character arrow.
+# omerxx's signature structure: keep the left side empty, push
 # everything else to the right via $all.
 format = """$directory$character"""
 
 # Right side: every module renders as its own pill with powerline
-# transitions. Modules not styled below (or disabled) are skipped.
+# transitions. $all is starship's catch-all variable that includes
+# every other module automatically.
 right_format = """$all"""
 
 # --- Prompt character ---------------------------------------------
+# Plain green text arrow — no chip, just the prompt symbol.
+# Same as omerxx's style: simple, no chrome.
 [character]
-success_symbol = '[➜](bold #a6e3a1)'
-error_symbol = '[➜](bold #f38ba8)'
+success_symbol = '[➜](bold green)'
+error_symbol = '[➜](bold red)'
 vimcmd_symbol = "[N]>>>"
 vimcmd_replace_symbol = "[R]>>>"
 vimcmd_replace_one_symbol = "[r]>>>"
 vimcmd_visual_symbol = "[V]>>>"
 
 # --- Directory pill (left side, first) -----------------------------
+# Blue bg, dark text — Catppuccin Mocha blue accent.
 [directory]
-style = "bg:#89b4fa fg:#1e1e2e bold"
+style = "bg:blue fg:base bold"
 format = "[ $path ]($style)"
 truncation_length = 3
 truncation_symbol = "…/"
 home_symbol = "~"
 read_only = " 🔒"
 
-# --- Username pill (optional, off by default) ---------------------
-[username]
-show_always = true
-style_user = "bg:#45475a fg:#f5c2e7 bold"
-style_root = "bg:#f38ba8 fg:#1e1e2e bold"
-format = "[ $user ]($style)"
-
-# --- Hostname pill (off by default) -------------------------------
-[hostname]
-ssh_only = false
-style = "bg:#45475a fg:#94e2d5 bold"
-format = "[@$hostname]($style)"
-
 # --- Git branch pill (yellow) -------------------------------------
 [git_branch]
 symbol = ""
-style = "bg:#f9e2af fg:#1e1e2e bold"
-format = "[$symbol$branch]($style)"
+style = "bg:yellow fg:base bold"
+format = "[$symbol$branch(:$remote_branch)]($style)"
 
 # --- Git status pill (red) ----------------------------------------
 [git_status]
-style = "bg:#f38ba8 fg:#1e1e2e bold"
+style = "bg:red fg:base bold"
 format = "[$all_status$ahead_behind]($style)"
 modified = "!"
 staged = "+"
@@ -74,52 +65,53 @@ ahead = "⇡${count}"
 behind = "⇣${count}"
 diverged = "⇕±${count}"
 
-# --- Language pills (sapphire, on their own) ----------------------
+# --- Language stack — sapphire accent, each on its own pill -------
+
 [nodejs]
 symbol = "⬢ "
-style = "bg:#74c7ec fg:#1e1e2e bold"
+style = "bg:sapphire fg:base bold"
 format = "[$symbol$version]($style)"
 
 [rust]
 symbol = "🦀 "
-style = "bg:#fab387 fg:#1e1e2e bold"
+style = "bg:peach fg:base bold"
 format = "[$symbol$version]($style)"
 
 [python]
 symbol = " "
-style = "bg:#f9e2af fg:#1e1e2e bold"
+style = "bg:yellow fg:base bold"
 format = "[$symbol$version]($style)"
 
 [golang]
 symbol = " "
-style = "bg:#94e2d5 fg:#1e1e2e bold"
+style = "bg:teal fg:base bold"
 format = "[$symbol$version]($style)"
 
 [java]
 symbol = "☕ "
-style = "bg:#f38ba8 fg:#1e1e2e bold"
+style = "bg:red fg:base bold"
 format = "[$symbol$version]($style)"
 
 [kotlin]
 symbol = "🟪 "
-style = "bg:#b4befe fg:#1e1e2e bold"
+style = "bg:lavender fg:base bold"
 format = "[$symbol$version]($style)"
 
 [ruby]
 symbol = "💎 "
-style = "bg:#f38ba8 fg:#1e1e2e bold"
+style = "bg:red fg:base bold"
 format = "[$symbol$version]($style)"
 
 [php]
 symbol = "🐘 "
-style = "bg:#b4befe fg:#1e1e2e bold"
+style = "bg:lavender fg:base bold"
 format = "[$symbol$version]($style)"
 
-# --- Time pill (lavender, rightmost) ------------------------------
+# --- Time pill (rightmost) ---------------------------------------
 [time]
 disabled = false
 time_format = "%R"
-style = "bg:#b4befe fg:#1e1e2e bold"
+style = "bg:lavender fg:base bold"
 format = "[ $time ]($style)"
 
 # --- Disabled (minimal prompt) ----------------------------------
@@ -127,7 +119,8 @@ format = "[ $time ]($style)"
 disabled = true
 
 # ============================================================================
-# Palette — Catppuccin Mocha (referenced by name throughout)
+# Palette — Catppuccin Mocha.
+# Used as `bg:NAME` / `fg:NAME` in module style strings above.
 # ============================================================================
 [palettes.catppuccin_mocha]
 rosewater = "#f5e0dc"
