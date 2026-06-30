@@ -70,16 +70,10 @@ $wingetPackages = @(
     @{ id = "Git.Git";                       name = "Git" },
     @{ id = "Docker.DockerDesktop";          name = "Docker Desktop" },
 
-    # Language runtimes (mise still owns per-project versions, but
-    # we install native ones for tooling outside WSL too).
-    @{ id = "Schniz.fnm";                    name = "Fast Node Manager" },
-    @{ id = "OpenJS.NodeJS.LTS";             name = "Node.js LTS" },
-    @{ id = "GoLang.Go";                     name = "Go" },
-    @{ id = "Rustlang.Rustup";               name = "Rust" },
-    @{ id = "Python.Python.3.12";            name = "Python 3.12" },
+    # .NET (not mise-managed)
     @{ id = "Microsoft.DotNet.SDK.9";        name = ".NET SDK 9" },
 
-    # Runtime manager
+    # Runtime manager (node, python, go, rust, bun, etc.)
     @{ id = "jdxcode.mise";                  name = "mise (runtime manager)" },
 
     # Terminals — WezTerm (Catppuccin Mocha, blur) is the GPU-accelerated
