@@ -8,7 +8,8 @@
 //   - Fish pane no size + tab-bar pane size=1
 //     → BOTH default to size=1, so they share 50/50 (broken!)
 //
-// Use size=100 on the fish pane to make it explicitly dominant.
+// `size` is a u16 integer — NOT a percentage. `"100%"` is silently
+// ignored and the pane falls back to size=1.
 
 layout {
     // The default template applied when a new tab is opened.
@@ -16,7 +17,7 @@ layout {
         // First pane: shell (fish) — takes ~99% of vertical space
         // and 100% of horizontal width. borderless=true removes the
         // pane border entirely.
-        pane size="100%" borderless=true {
+        pane size=100 borderless=true {
             command "fish"
         }
         // Tab bar pinned to the bottom — fixed at 1 row.

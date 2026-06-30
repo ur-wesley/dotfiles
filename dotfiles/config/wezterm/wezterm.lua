@@ -41,10 +41,10 @@ local mocha = {
 -- Match Rio: 1280x820 area, transparent w/ blur. On Windows 11 the OS
 -- (DWM) applies acrylic blur automatically when window_background_opacity
 -- is < 1.0; window_background_blur is a no-op there but kept for parity
--- with macOS / Linux blur.
+-- with macOS / Linux blur. opacity=0.78 + blur=35 = strong frosted-glass.
 config.window_decorations = 'RESIZE'        -- clean borderless title bar
-config.window_background_opacity = 0.85
-config.window_background_blur = 20
+config.window_background_opacity = 0.78     -- stronger frost: more desktop
+config.window_background_blur = 35          -- visible through the panel
 config.window_corner_radius = 12            -- Win11 rounded corners
                                               -- (matches Rio's rounded bg)
 
