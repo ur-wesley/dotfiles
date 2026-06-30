@@ -178,7 +178,9 @@ if (-not $SkipNixOS) {
 
         # Set as default + apply wsl.conf
         wsl --set-default NixOS 2>&1 | Out-Null
-        wsl -d NixOS -u root -- bash -c @'
+        $wslPath = wsl -d NixOS -u root -- wslpath ($NixConfigDir.Replace('\', '/'))
+        $wslPath = $wslPath.Trim()
+        wsl -d NixOS -u root -- bash -c "
 set -euo pipefail
 # wsl.conf
 cat > /etc/wsl.conf <<'EOF'
@@ -197,14 +199,19 @@ mountFsTab=true
 generateHosts=true
 generateResolvConf=true
 EOF
+
 # Create user
-useradd -m -G wheel -s /nix/store/...placeholder.../fish  wesley 2>/dev/null \
-  || useradd -m -G wheel -s "$(which fish)" wesley
-echo "wesley ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheel-nopasswd
+if ! id -u wesley >/dev/null 2>&1; then
+    useradd -m -G wheel -s /bin/bash wesley
+fi
+echo 'wesley ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/wheel-nopasswd
 chmod 0440 /etc/sudoers.d/wheel-nopasswd
-# First-boot fish-install on PATH
-chsh -s "$(which fish)" wesley
-'@
+
+# Symlink nix-config repo inside WSL
+rm -f /home/wesley/nix-config
+ln -s '$wslPath' /home/wesley/nix-config
+chown -h wesley:users /home/wesley/nix-config
+"
         Ok "NixOS-WSL configured"
     }
 }
@@ -259,6 +266,26 @@ if (-not $SkipStow -and (Test-Path "$NixConfigDir\dotfiles")) {
 
     # dotfiles/home/* -> ~/
     Invoke-DotfileSymlinks -Source "$NixConfigDir\dotfiles\home" -Target $HOME
+
+    # Symlink Windows Terminal settings.json
+    $wtDir = Resolve-Path "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal*\LocalState" -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($wtDir) {
+        $wtSettings = Join-Path $wtDir.Path "settings.json"
+        $repoSettings = "$NixConfigDir\dotfiles\config\windows-terminal\settings.json"
+        if (Test-Path $repoSettings) {
+            if (Test-Path $wtSettings) {
+                $existing = Get-Item $wtSettings -Force
+                if (-not ($existing.Attributes -band [IO.FileAttributes]::ReparsePoint)) {
+                    Move-Item $wtSettings "$wtSettings.bak" -Force
+                    Ok "Backed up existing Windows Terminal settings to settings.json.bak"
+                } else {
+                    Remove-Item $wtSettings -Force
+                }
+            }
+            New-Item -ItemType SymbolicLink -Path $wtSettings -Target $repoSettings | Out-Null
+            Ok "Symlinked Windows Terminal settings.json"
+        }
+    }
 
     Ok "dotfiles symlinked into $HOME"
 }
