@@ -1,107 +1,70 @@
-# Wesley's starship config — Catppuccin Powerline (Mocha), pill-style chips.
-# Adapted from the official starship Catppuccin Powerline preset.
-# Shared between home-manager (Nix) and stow (Windows).
+# Wesley's starship config — omerxx-style minimal.
+# Layout: minimal left prompt ($directory + $character), everything else
+# on the right via $all. Catppuccin Mocha palette + per-module chip
+# styling for that "rounded pill" look.
 #
-# Layout:
-#   - Left: directory (cwd) → username → host → character
-#   - Right: git_branch → git_status → languages → time
-#
-# Each chip is a filled pill with a powerline arrow on its right edge,
-# in the next chip's color — that's what creates the "rounded pill"
-# look that flows smoothly between modules.
-#
-# Apply changes from WSL:
-#   ~/nix-config/dotfiles/update.sh
-#
-# Requires a Nerd Font (JetBrainsMono Nerd Font) for the powerline glyphs.
+# Inspired by https://github.com/omerxx/dotfiles
+# Apply changes from WSL: ~/nix-config/dotfiles/update.sh
+# Requires a Nerd Font for the powerline glyphs.
 
 "$schema" = "https://starship.rs/config-schema.json"
+add_newline = false
 command_timeout = 1000
 scan_timeout = 5000
 continuation_prompt = "[▸▸](bold blue)"
 
-# Catppuccin Mocha palette — referenced by name throughout.
-palette = 'catppuccin_mocha'
+palette = "catppuccin_mocha"
 
-# LEFT: directory (cwd) → username → host → character
-# RIGHT: git_branch → git_status → languages → time
-#
-# Each line ends with `\` (multi-line literal). Between modules:
-#   ` `              — visible space (visual padding between pills)
-#   `[](fg:X bg:Y)`  — powerline transition arrow in `bg:Y` color
-#
-# The space-after-arrow is what gives the "separated, floating pill"
-# look — each chip stands on its own with breathing room around it.
-format = """
-$directory\
- [](fg:green bg:maroon)\
- $username\
- [](fg:maroon bg:peach)\
- $hostname\
- [](fg:peach bg:mauve)\
- $character\
- [](fg:mauve)"""
+# Minimal left prompt — just the cwd and the prompt character.
+# This is omerxx's signature: keep the left side empty, push
+# everything else to the right via $all.
+format = """$directory$character"""
 
-right_format = """
- [](fg:maroon bg:yellow)\
- $git_branch\
- [](fg:yellow bg:red)\
- $git_status\
- [](fg:red bg:sapphire)\
- $nodejs\
- $rust\
- $python\
- $golang\
- $java\
- $kotlin\
- $ruby\
- $php\
- [](fg:sapphire bg:lavender)\
- $time\
- [](fg:lavender)"""
+# Right side: every module renders as its own pill with powerline
+# transitions. Modules not styled below (or disabled) are skipped.
+right_format = """$all"""
 
-# --- Prompt arrow (left side, mauve chip) -------------------------
+# --- Prompt character ---------------------------------------------
 [character]
-disabled = false
-success_symbol = '[❯](bold fg:crust bg:mauve)'
-error_symbol = '[❯](bold fg:crust bg:red)'
-vimcmd_symbol = '[❮](bold fg:crust bg:green)'
-vimcmd_replace_one_symbol = '[❮](bold fg:crust bg:lavender)'
-vimcmd_replace_symbol = '[❮](bold fg:crust bg:lavender)'
-vimcmd_visual_symbol = '[❮](bold fg:crust bg:yellow)'
+success_symbol = '[➜](bold #a6e3a1)'
+error_symbol = '[➜](bold #f38ba8)'
+vimcmd_symbol = "[N]>>>"
+vimcmd_replace_symbol = "[R]>>>"
+vimcmd_replace_one_symbol = "[r]>>>"
+vimcmd_visual_symbol = "[V]>>>"
 
-# --- Directory chip (green, first on left) -------------------------
+# --- Directory pill (left side, first) -----------------------------
 [directory]
-style = "bg:green fg:crust"
-format = '[ $path ]($style)'
+style = "bg:#89b4fa fg:#1e1e2e bold"
+format = "[ $path ]($style)"
 truncation_length = 3
 truncation_symbol = "…/"
 home_symbol = "~"
 read_only = " 🔒"
 
-# --- Username chip (maroon) ---------------------------------------
+# --- Username pill (optional, off by default) ---------------------
 [username]
 show_always = true
-style_user = "bg:maroon fg:crust"
-style_root = "bg:red fg:crust"
-format = '[ $user ]($style)'
+style_user = "bg:#45475a fg:#f5c2e7 bold"
+style_root = "bg:#f38ba8 fg:#1e1e2e bold"
+format = "[ $user ]($style)"
 
-# --- Hostname chip (peach) ----------------------------------------
+# --- Hostname pill (off by default) -------------------------------
 [hostname]
 ssh_only = false
-style = "bg:peach fg:crust"
-format = '[@$hostname]($style)'
+style = "bg:#45475a fg:#94e2d5 bold"
+format = "[@$hostname]($style)"
 
-# --- Git branch chip (yellow) -------------------------------------
+# --- Git branch pill (yellow) -------------------------------------
 [git_branch]
 symbol = ""
-style = "bg:yellow fg:crust"
-format = '[ $symbol$branch ]($style)'
+style = "bg:#f9e2af fg:#1e1e2e bold"
+format = "[$symbol$branch]($style)"
 
-# --- Git status chip (red, only when dirty) -----------------------
+# --- Git status pill (red) ----------------------------------------
 [git_status]
-style = "bg:red fg:crust"
-format = '[$all_status$ahead_behind ]($style)'
+style = "bg:#f38ba8 fg:#1e1e2e bold"
+format = "[$all_status$ahead_behind]($style)"
 modified = "!"
 staged = "+"
 renamed = "»"
@@ -111,61 +74,60 @@ ahead = "⇡${count}"
 behind = "⇣${count}"
 diverged = "⇕±${count}"
 
-# --- Language stack — sapphire chips, each on its own pill -------
-
+# --- Language pills (sapphire, on their own) ----------------------
 [nodejs]
-symbol = ""
-style = "bg:sapphire fg:crust"
-format = '[ $symbol$version ]($style)'
+symbol = "⬢ "
+style = "bg:#74c7ec fg:#1e1e2e bold"
+format = "[$symbol$version]($style)"
 
 [rust]
-symbol = ""
-style = "bg:sapphire fg:crust"
-format = '[ $symbol$version ]($style)'
+symbol = "🦀 "
+style = "bg:#fab387 fg:#1e1e2e bold"
+format = "[$symbol$version]($style)"
 
 [python]
-symbol = ""
-style = "bg:sapphire fg:crust"
-format = '[ $symbol$version ]($style)'
+symbol = " "
+style = "bg:#f9e2af fg:#1e1e2e bold"
+format = "[$symbol$version]($style)"
 
 [golang]
-symbol = ""
-style = "bg:sapphire fg:crust"
-format = '[ $symbol$version ]($style)'
+symbol = " "
+style = "bg:#94e2d5 fg:#1e1e2e bold"
+format = "[$symbol$version]($style)"
 
 [java]
-symbol = ""
-style = "bg:sapphire fg:crust"
-format = '[ $symbol$version ]($style)'
+symbol = "☕ "
+style = "bg:#f38ba8 fg:#1e1e2e bold"
+format = "[$symbol$version]($style)"
 
 [kotlin]
-symbol = ""
-style = "bg:sapphire fg:crust"
-format = '[ $symbol$version ]($style)'
+symbol = "🟪 "
+style = "bg:#b4befe fg:#1e1e2e bold"
+format = "[$symbol$version]($style)"
 
 [ruby]
-symbol = ""
-style = "bg:sapphire fg:crust"
-format = '[ $symbol$version ]($style)'
+symbol = "💎 "
+style = "bg:#f38ba8 fg:#1e1e2e bold"
+format = "[$symbol$version]($style)"
 
 [php]
-symbol = ""
-style = "bg:sapphire fg:crust"
-format = '[ $symbol$version ]($style)'
+symbol = "🐘 "
+style = "bg:#b4befe fg:#1e1e2e bold"
+format = "[$symbol$version]($style)"
 
-# --- Time chip (rightmost, lavender) ------------------------------
+# --- Time pill (lavender, rightmost) ------------------------------
 [time]
 disabled = false
 time_format = "%R"
-style = "bg:lavender fg:crust"
-format = '[ $time ]($style)'
+style = "bg:#b4befe fg:#1e1e2e bold"
+format = "[ $time ]($style)"
 
-# --- Disabled (minimal prompt) -----------------------------------
+# --- Disabled (minimal prompt) ----------------------------------
 [memory_usage]
 disabled = true
 
 # ============================================================================
-# Palette — Catppuccin Mocha.
+# Palette — Catppuccin Mocha (referenced by name throughout)
 # ============================================================================
 [palettes.catppuccin_mocha]
 rosewater = "#f5e0dc"
