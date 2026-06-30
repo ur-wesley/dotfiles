@@ -8,13 +8,15 @@ log-level = "DEBUG"
 enable-log-file = true
 
 # ---- Window ----------------------------------------------------------
-# Glass/blur background with a touch of transparency — the Catppuccin
-# Mocha base color shows through any desktop wallpaper.
+# Opacity 1.0 — fully opaque Catppuccin Mocha base (#1e1e2e). With opacity
+# below ~0.95 the desktop wallpaper bleeds through and washes the bg
+# out to a muddy lavender-grey. Set blur=true for a subtle frosted
+# effect on the title bar only; the terminal pane stays solid.
 [window]
 width = 1280
 height = 820
-opacity = 0.85
-blur = true
+opacity = 1.0
+blur = false
 decorations = "Transparent"
 # Top padding leaves room for the tab strip when 2+ tabs are open.
 # Bottom/sides are 0 so the terminal uses the full window.
