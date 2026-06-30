@@ -175,12 +175,13 @@ if (-not $SkipNixOS) {
         wsl --import NixOS "C:\WSL\NixOS" $tmp --version 2
         Remove-Item $tmp
         Ok "NixOS-WSL imported"
+    }
 
-        # Set as default + apply wsl.conf
-        wsl --set-default NixOS 2>&1 | Out-Null
-        $wslPath = wsl -d NixOS -u root -- wslpath ($NixConfigDir.Replace('\', '/'))
-        $wslPath = $wslPath.Trim()
-        wsl -d NixOS -u root -- bash -c "
+    # Set as default + apply wsl.conf
+    wsl --set-default NixOS 2>&1 | Out-Null
+    $wslPath = wsl -d NixOS -u root -- wslpath ($NixConfigDir.Replace('\', '/'))
+    $wslPath = $wslPath.Trim()
+    wsl -d NixOS -u root -- bash -c "
 set -euo pipefail
 # wsl.conf
 cat > /etc/wsl.conf <<'EOF'
@@ -212,8 +213,7 @@ rm -f /home/wesley/nix-config
 ln -s '$wslPath' /home/wesley/nix-config
 chown -h wesley:users /home/wesley/nix-config
 "
-        Ok "NixOS-WSL configured"
-    }
+    Ok "NixOS-WSL configured"
 }
 
 # ---- Clone nix-config ------------------------------------------------
@@ -285,6 +285,23 @@ if (-not $SkipStow -and (Test-Path "$NixConfigDir\dotfiles")) {
             New-Item -ItemType SymbolicLink -Path $wtSettings -Target $repoSettings | Out-Null
             Ok "Symlinked Windows Terminal settings.json"
         }
+    }
+
+    # Handle shadowing .wezterm.lua in home directory
+    $wtHomeConfig = Join-Path $HOME ".wezterm.lua"
+    if (Test-Path $wtHomeConfig) {
+        $existing = Get-Item $wtHomeConfig -Force
+        if (-not ($existing.Attributes -band [IO.FileAttributes]::ReparsePoint)) {
+            Move-Item $wtHomeConfig "$wtHomeConfig.bak" -Force
+            Ok "Backed up existing .wezterm.lua in home to .wezterm.lua.bak"
+        } else {
+            Remove-Item $wtHomeConfig -Force
+        }
+    }
+    $repoWezterm = "$NixConfigDir\dotfiles\config\wezterm\wezterm.lua"
+    if (Test-Path $repoWezterm) {
+        New-Item -ItemType SymbolicLink -Path $wtHomeConfig -Target $repoWezterm | Out-Null
+        Ok "Symlinked .wezterm.lua in home"
     }
 
     Ok "dotfiles symlinked into $HOME"
