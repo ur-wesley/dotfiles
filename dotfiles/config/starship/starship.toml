@@ -1,13 +1,17 @@
-# Wesley's starship config — Catppuccin Mocha with full background chips.
+# Wesley's starship config — Catppuccin Mocha with full background chips + icons.
 # Shared between home-manager (Nix) and stow (Windows).
 # Literal $ characters are intentional — starship uses them for module
 # references. Don't escape them.
 #
 # Chip design:
-#   - Each module renders as `[ text ](bg:accent fg:text)` — a filled block
-#     with bracket characters rendered as solid powerline separators when
-#     a Nerd Font is active, creating the rounded "chip" appearance.
+#   - Each module renders as `[ icon text ](bg:accent fg:text)` — a filled
+#     block with bracket characters rendered as solid powerline separators
+#     when a Nerd Font is active, creating the rounded "chip" appearance.
+#   - Each chip has a leading Nerd Font icon (folder, branch, clock, etc).
 #   - Catppuccin Mocha accents for backgrounds, dark text for contrast.
+#
+# Apply changes from WSL:
+#   ~/nix-config/dotfiles/update.sh
 
 "$schema" = "https://starship.rs/config-schema.json"
 command_timeout = 1000
@@ -37,40 +41,40 @@ disabled = false
 [username]
 style_user = "bg:#45475a fg:#f5c2e7 bold"
 style_root = "bg:#f38ba8 fg:#1e1e2e bold"
-format = "[ $user ]($style) "
+format = "[  $user ]($style) "
 show_always = true
 disabled = false
 
 # --- Hostname chip ---------------------------------------------
-# Surface1 background, teal foreground.
+# Surface1 background, teal foreground. Server icon prefix.
 [hostname]
 ssh_only = false
 style = "bg:#45475a fg:#94e2d5 bold"
-format = "[@ $hostname ]($style) "
+format = "[@  $hostname ]($style) "
 disabled = false
 
 # --- Directory chip --------------------------------------------
-# Blue background, dark foreground. Path fills the chip.
+# Blue background, dark foreground. Nerd Font folder icon prefix.
 [directory]
 style = "bg:#89b4fa fg:#1e1e2e bold"
-format = "[ $path ]($style) "
+format = "[  $path ]($style) "
 truncation_length = 3
 truncation_symbol = "…/"
 home_symbol = "~"
-read_only = " 🔒"
+read_only = "  🔒"
 
 # --- Git branch chip -------------------------------------------
-# Peach background, dark foreground.
+# Peach background, dark foreground. Nerd Font git-branch icon prefix.
 [git_branch]
-symbol = " "
+symbol = ""
 style = "bg:#fab387 fg:#1e1e2e bold"
-format = "[$symbol$branch]($style) "
+format = "[$symbol $branch]($style) "
 
 # --- Git status chip -------------------------------------------
 # Red background when there are changes, dark foreground.
 [git_status]
 style = "bg:#f38ba8 fg:#1e1e2e bold"
-format = "[$all_status$ahead_behind]($style) "
+format = "[ $all_status$ahead_behind ]($style) "
 modified = "!"
 staged = "+"
 renamed = "»"
@@ -81,7 +85,7 @@ behind = "⇣${count}"
 diverged = "⇕±${count}"
 
 # --- Language stack chips --------------------------------------
-# Each language gets its own Catppuccin Mocha accent.
+# Each language gets its own Nerd Font icon + Catppuccin Mocha accent.
 
 [nodejs]
 symbol = "⬢ "
@@ -94,14 +98,14 @@ style = "bg:#fab387 fg:#1e1e2e bold"
 format = "[$symbol$version]($style) "
 
 [golang]
-symbol = "go "
+symbol = ""
 style = "bg:#94e2d5 fg:#1e1e2e bold"
-format = "[$symbol$version]($style) "
+format = "[$symbol $version]($style) "
 
 [python]
-symbol = "py "
+symbol = ""
 style = "bg:#f9e2af fg:#1e1e2e bold"
-format = "[$symbol$version]($style) "
+format = "[$symbol $version]($style) "
 
 [java]
 symbol = "☕ "
@@ -124,10 +128,10 @@ style = "bg:#b4befe fg:#1e1e2e bold"
 format = "[$symbol$version]($style) "
 
 # --- Time chip (rightmost, always visible) --------------------
-# Red chip — pops against the Catppuccin Mocha palette.
+# Red chip — pops against the Catppuccin Mocha palette. Clock icon prefix.
 [time]
 style = "bg:#f38ba8 fg:#1e1e2e bold"
-format = "[ $time ]($style)"
+format = "[  $time ]($style)"
 time_format = "%R"
 disabled = false
 
