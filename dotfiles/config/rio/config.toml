@@ -49,7 +49,10 @@ padding = [24, 12, 8, 12]
 # are preserved verbatim — double-quoted strings would interpret
 # `\n` in `nix-config` as a newline and break the path.
 background-image = 'C:\Users\parac\nix-config\dotfiles\rio-bg.png'
-background-image-opacity = 1.0
+# 0.95 opacity gives the bg a slight transparency so even if a render
+# bug overlays the image on the text, characters stay visible. If
+# your wallpaper is dark, push this back up to 1.0.
+background-image-opacity = 0.95
 background-image-fit = "Cover"
 
 # Inner panel — small margin (8px on all sides) so the rounded bg

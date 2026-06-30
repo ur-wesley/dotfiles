@@ -1,24 +1,30 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # generate-rio-bg.sh — create a Catppuccin Mocha rounded rectangle PNG
-# for use as Rio's background-image. Run once on WSL.
+# with proper RGBA alpha channel. Run from WSL.
 #
-# Output: /home/wesley/nix-config/dotfiles/rio-bg.png (1280x820, 24px radius)
+# IMPORTANT: the PNG must be RGBA. A solid sRGB PNG without alpha
+# drawn as Rio's background-image will HIDE the terminal text,
+# because Rio paints the image ON TOP of the text in some
+# configurations. Use Pillow for proper RGBA control.
+#
+# Output: /home/wesley/nix-config/dotfiles/rio-bg.png
+#         1280x820, 32px corner radius, RGBA
 
 set -euo pipefail
 
 OUT="/home/wesley/nix-config/dotfiles/rio-bg.png"
-WIDTH=1280
-HEIGHT=820
-RADIUS=32
-BG="#1e1e2e"  # Catppuccin Mocha base
 
-magick -size ${WIDTH}x${HEIGHT} xc:none \
-    -fill "$BG" \
-    -draw "roundrectangle 0,0 $((WIDTH-1)),$((HEIGHT-1)) $RADIUS,$RADIUS" \
-    "$OUT"
+# Run Pillow in a nix-shell so PIL is available.
+PATH=/etc/profiles/per-user/wesley/bin:$PATH \
+    nix-shell -p python3Packages.pillow --run "python3 $REPO_DIR/dotfiles/config/rio/generate-rio-bg.py" \
+    || true
 
-echo "Wrote $OUT ($WIDTH x $HEIGHT, ${RADIUS}px corner radius)"
-echo "In Rio config, uncomment:"
-echo "  background-image = \"$OUT\""
-echo "  background-image-opacity = 1.0"
+echo ""
+echo "Verify alpha:"
+PATH=/etc/profiles/per-user/wesley/bin:$PATH magick identify -format '  channels=%[channels]\n' "$OUT"
+PATH=/etc/profiles/per-user/wesley/bin:$PATH magick "$OUT" -crop 1x1+0+0 txt: | tail -1
+echo ""
+echo "In Rio config:"
+echo "  background-image = 'C:\\\\Users\\\\parac\\\\nix-config\\\\dotfiles\\\\rio-bg.png'"
+echo "  background-image-opacity = 0.95"
 echo "  background-image-fit = \"Cover\""
