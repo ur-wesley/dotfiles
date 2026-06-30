@@ -166,8 +166,7 @@ if (-not $SkipNixOS) {
         $tmp = Join-Path $env:TEMP "nixos.wsl"
         Write-Host "  -> Downloading $($rootfs.name)..." -ForegroundColor DarkGray
         Invoke-WebRequest -Uri $rootfs.browser_download_url -OutFile $tmp -UseBasicParsing
-        $sha = Invoke-WebRequest "$($rootfs.browser_download_url).sha256" -UseBasicParsing `
-            | Select-Object -ExpandProperty Content
+        $sha = Invoke-RestMethod -Uri "$($rootfs.browser_download_url).sha256" -UseBasicParsing
         $actual = (Get-FileHash $tmp -Algorithm SHA256).Hash.ToLower()
         if ($actual -ne $sha.Trim().Split()[0]) {
             Fail "NixOS rootfs SHA256 mismatch"; exit 1
