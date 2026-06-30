@@ -96,6 +96,7 @@ config.colors = {
   selection_bg = mocha.pink,
   scrollbar_thumb = mocha.overlay0,
   split = mocha.surface2,
+  visual_bell = mocha.red,
   ansi = {
     mocha.base, mocha.red,  mocha.green, mocha.yellow,
     mocha.blue,  mocha.pink, mocha.teal,  mocha.subtext1,
@@ -133,7 +134,6 @@ config.colors = {
 config.hide_tab_bar_if_only_one_tab = true   -- matches Rio's hide-if-single
 config.use_fancy_tab_bar = false             -- flat tab strip, like Rio
 config.show_new_tab_button_in_tab_bar = false
-config.show_close_button_in_tab_bar = false
 config.tab_bar_at_bottom = false
 config.enable_scroll_bar = true
 
@@ -156,7 +156,8 @@ config.force_reverse_video_cursor = false
 
 -- ---- Scroll ------------------------------------------------------------
 config.scrollback_lines = 10000
-config.mouse_scroll_multiplier = 3           -- matches Rio's [scroll] multiplier
+-- alternate_buffer_wheel_scroll_speed default is 3, matching Rio's
+-- [scroll] multiplier. No need to set it explicitly.
 
 -- ---- Bell --------------------------------------------------------------
 config.audible_bell = 'Disabled'
