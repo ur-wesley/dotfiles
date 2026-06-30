@@ -85,6 +85,10 @@ $wingetPackages = @(
     # Runtime manager
     @{ id = "jdxcode.mise";                  name = "mise (runtime manager)" },
 
+    # Terminals — WezTerm (Catppuccin Mocha, blur) is the GPU-accelerated
+    # alternative to Rio (Rust, simpler). Both share dotfiles/config/<x>/.
+    @{ id = "wez.wezterm";                   name = "WezTerm (GPU terminal)" },
+
     # Modern Unix CLI — fish-parity stack for PowerShell 7.
     # See dotfiles/home/powershell/Microsoft.PowerShell_profile.ps1
     @{ id = "gerardog.gsudo";                name = "gsudo (sudo for Windows)" },

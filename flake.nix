@@ -57,6 +57,7 @@
                   ./home/wesley/zellij.nix
                   ./home/wesley/television.nix
                   ./home/wesley/nvim.nix
+                  ./home/wesley/wezterm.nix
                 ];
                 home = {
                   username = "wesley";

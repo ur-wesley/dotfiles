@@ -222,6 +222,12 @@ mouse_mode false
 // 10k lines of scrollback per pane.
 scroll_buffer_size 10000
 
+// Force truecolor terminal — the default screen-256color downgrades
+// our 24-bit RGB palette to 256 colors, which makes the Catppuccin
+// Mocha theme look washed out. alacritty supports 24-bit RGB and
+// is well-supported by most modern terminal emulators.
+default_terminal "alacritty"
+
 // Explicit copy (Alt+C). Copy on select is off (we want manual control).
 copy_on_select false
 copy_command "clip.exe"

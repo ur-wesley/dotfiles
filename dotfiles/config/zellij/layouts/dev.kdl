@@ -1,25 +1,27 @@
-// Wesley's zellij default layout — single fish pane + bottom tab bar.
+// Wesley's zellij default layout — single fish pane that fills the
+// ENTIRE terminal (no border, full width and full height).
 //
-// Critical detail: panes inside default_tab_template that all have
-// `size=1` share the available height EQUALLY (50/50). To get a
-// full-height shell pane + a fixed 1-row tab bar, the shell pane
-// must have NO `size` attribute (grows to fill) and the tab-bar
-// pane must keep `size=1`.
+// IMPORTANT: panes inside `default_tab_template` share the available
+// space PROPORTIONALLY to their `size=` values. So:
+//   - Fish pane size=100 + tab-bar pane size=1
+//     → fish gets 100/101 ≈ 99%, tab-bar gets 1/101 ≈ 1 row
+//   - Fish pane no size + tab-bar pane size=1
+//     → BOTH default to size=1, so they share 50/50 (broken!)
 //
-// Resizes gracefully to any terminal size — the fish pane fills
-// whatever vertical space the tab bar doesn't use.
+// Use size=100 on the fish pane to make it explicitly dominant.
 
 layout {
     // The default template applied when a new tab is opened.
     default_tab_template {
-        // First pane: shell (fish) — fills all available height.
-        // NO `size=` attribute means "grow to fill remaining space".
-        pane {
+        // First pane: shell (fish) — takes ~99% of vertical space
+        // and 100% of horizontal width. borderless=true removes the
+        // pane border entirely.
+        pane size="100%" borderless=true {
             command "fish"
         }
         // Tab bar pinned to the bottom — fixed at 1 row.
         // borderless=true so the tab bar doesn't take any extra
-        // padding. With `hide-if-single=true` (zellij's default),
+        // padding. With zellij's default `hide-if-single=true`,
         // this pane only renders when 2+ tabs exist.
         pane size=1 borderless=true {
             plugin location="zellij:tab-bar" {

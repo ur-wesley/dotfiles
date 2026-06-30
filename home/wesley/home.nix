@@ -9,6 +9,7 @@
     ./cli-tools.nix
     ./dev-tools.nix
     ./nvim.nix
+    ./wezterm.nix
   ];
 
   home = {

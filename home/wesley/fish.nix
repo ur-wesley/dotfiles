@@ -246,6 +246,13 @@
       # Ensure PATH is set up properly for SSH sessions
       fish_add_path -p /run/current-system/sw/bin
 
+      # Force truecolor terminal so starship + zellij can emit
+      # 24-bit RGB colors. Without this, colors get downgraded to
+      # a 256-color palette and the Catppuccin Mocha theme looks
+      # washed out.
+      set -gx TERM alacritty
+      set -gx COLORTERM truecolor
+
       # WSL workaround: nix store is on a separate ext4 partition
       # that loses the setuid bit on every rebuild. Fix it on login.
       for sudo_path in /nix/store/*-sudo*/bin/sudo /nix/store/*-sudo-rs*/bin/sudo
