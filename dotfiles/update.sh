@@ -110,6 +110,9 @@ ok "Active home-manager-files: $ACTIVE_FILES"
 
 # Walk every file in the active generation's .config and recreate the
 # matching symlink under ~/.config. Stale symlinks get blown away.
+#
+# Note: use `-type l` not `-type f` — the Nix store's .config/* entries
+# are symlinks (to /nix/store/*-hm_<name>), not regular files.
 COUNT=0
 while IFS= read -r -d '' src; do
     rel="${src#$ACTIVE_FILES/.config/}"
@@ -118,7 +121,7 @@ while IFS= read -r -d '' src; do
     rm -f "$dest"
     ln -sfn "$src" "$dest"
     COUNT=$((COUNT + 1))
-done < <(find "$ACTIVE_FILES/.config" -type f -print0 2>/dev/null)
+done < <(find "$ACTIVE_FILES/.config" -type l -print0 2>/dev/null)
 ok "Relinked $COUNT files under ~/.config/"
 
 # home.file."<path>" entries outside ~/.config/ — explicit list
