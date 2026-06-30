@@ -8,19 +8,17 @@ log-level = "DEBUG"
 enable-log-file = true
 
 # ---- Window ----------------------------------------------------------
-# Opacity 0.95 + blur=true. The terminal pane stays 95% opaque so
-# Catppuccin Mocha colors keep full saturation (matches Windows
-# Terminal); 5% of the wallpaper bleeds through, blurred, for a
-# subtle frosted-glass effect on the title bar and edges.
-#
-# If your desktop wallpaper is bright/light, opacity 0.85-0.90 will
-# wash out the colors more. If your wallpaper is dark, opacity 1.0
-# (no blur) is fine.
+# Opacity 1.0 (fully opaque text and bg) + blur=false. The terminal
+# pane is solid Catppuccin Mocha — text colors stay at full saturation
+# (matches Windows Terminal). Rio's `opacity` applies to BOTH the
+# background and the text, so to keep text vibrant we keep the window
+# fully opaque and rely on the OS-level compositor (Windows acrylic)
+# for the frosted-glass effect on the transparent title bar.
 [window]
 width = 1280
 height = 820
-opacity = 0.95
-blur = true
+opacity = 1.0
+blur = false
 decorations = "Transparent"
 # Top padding leaves room for the tab strip when 2+ tabs are open.
 # Bottom/sides are 0 so the terminal uses the full window.

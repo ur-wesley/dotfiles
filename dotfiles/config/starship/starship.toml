@@ -2,9 +2,13 @@
 # Adapted from the official starship Catppuccin Powerline preset.
 # Shared between home-manager (Nix) and stow (Windows).
 #
-# Each chip is its own filled pill with explicit padding (▸...▸), so
-# the visual is: rounded pill → powerline arrow → next pill.
-# Time and git live on the RIGHT side of the terminal.
+# Layout:
+#   - Left: directory (cwd) → username → host → character
+#   - Right: git_branch → git_status → languages → time
+#
+# Each chip is a filled pill with a powerline arrow on its right edge,
+# in the next chip's color — that's what creates the "rounded pill"
+# look that flows smoothly between modules.
 #
 # Apply changes from WSL:
 #   ~/nix-config/dotfiles/update.sh
@@ -16,21 +20,32 @@ command_timeout = 1000
 scan_timeout = 5000
 continuation_prompt = "[▸▸](bold blue)"
 
-# Use the bundled Catppuccin Mocha palette — colors are referenced by
-# name (e.g. `bg:peach`) throughout this file.
+# Catppuccin Mocha palette — referenced by name throughout.
 palette = 'catppuccin_mocha'
 
-# Left: just the prompt arrow (no chips — keeps the prompt slim).
-# Right: cwd → git → languages → time (every "thing" on its own pill).
+# LEFT: directory (cwd) → username → host → character
+# RIGHT: git_branch → git_status → languages → time
 #
-# Each module renders as `[ text ]($style)` which the Nerd Font draws
-# as a solid filled pill. Between modules, `[](fg:prev bg:next)` adds
-# the powerline arrow that bridges to the next pill color.
-format = "[❯](bold fg:green) "
-right_format = """\
+# Each line ends with `\` (multi-line literal). Between modules,
+# `[](fg:prev_bg bg:next_bg)` is a powerline transition arrow —
+# starship draws a "▸" in `next_bg` to bridge from the previous
+# chip's color to the next.
+format = """
 $directory\
+[](fg:green bg:maroon)\
+$username\
+[](fg:maroon bg:peach)\
+$hostname\
+[](fg:peach bg:mauve)\
+$character\
+[](fg:mauve)"""
+
+right_format = """
+[](fg:maroon bg:yellow)\
 $git_branch\
+[](fg:yellow bg:red)\
 $git_status\
+[](fg:red bg:sapphire)\
 $nodejs\
 $rust\
 $python\
@@ -39,39 +54,52 @@ $java\
 $kotlin\
 $ruby\
 $php\
+[](fg:sapphire bg:lavender)\
 $time\
 [](fg:lavender)"""
 
-# --- Prompt arrow (left only, no chip) -----------------------------
+# --- Prompt arrow (left side, mauve chip) -------------------------
 [character]
 disabled = false
-success_symbol = '[❯](bold fg:green)'
-error_symbol = '[❯](bold fg:red)'
-vimcmd_symbol = '[❮](bold fg:green)'
-vimcmd_replace_one_symbol = '[❮](bold fg:lavender)'
-vimcmd_replace_symbol = '[❮](bold fg:lavender)'
-vimcmd_visual_symbol = '[❮](bold fg:yellow)'
+success_symbol = '[❯](bold fg:crust bg:mauve)'
+error_symbol = '[❯](bold fg:crust bg:red)'
+vimcmd_symbol = '[❮](bold fg:crust bg:green)'
+vimcmd_replace_one_symbol = '[❮](bold fg:crust bg:lavender)'
+vimcmd_replace_symbol = '[❮](bold fg:crust bg:lavender)'
+vimcmd_visual_symbol = '[❮](bold fg:crust bg:yellow)'
 
-# --- Directory pill -----------------------------------------------
+# --- Directory chip (green, first on left) -------------------------
 [directory]
 style = "bg:green fg:crust"
-format = '[[ $path ](fg:crust bg:green)](bg:peach)'
+format = '[ $path ]($style)'
 truncation_length = 3
 truncation_symbol = "…/"
 home_symbol = "~"
 read_only = " 🔒"
 
-# --- Git branch pill -----------------------------------------------
+# --- Username chip (maroon) ---------------------------------------
+[username]
+show_always = true
+style_user = "bg:maroon fg:crust"
+style_root = "bg:red fg:crust"
+format = '[ $user ]($style)'
+
+# --- Hostname chip (peach) ----------------------------------------
+[hostname]
+ssh_only = false
+style = "bg:peach fg:crust"
+format = '[@$hostname]($style)'
+
+# --- Git branch chip (yellow) -------------------------------------
 [git_branch]
 symbol = ""
-style = "bg:peach fg:crust"
-format = '[[ $symbol$branch ](fg:crust bg:peach)](bg:yellow)'
+style = "bg:yellow fg:crust"
+format = '[ $symbol$branch ]($style)'
 
-# --- Git status pill ----------------------------------------------
-# Red pill — only shows up when there are actual changes.
+# --- Git status chip (red, only when dirty) -----------------------
 [git_status]
 style = "bg:red fg:crust"
-format = '[[($all_status$ahead_behind )](fg:crust bg:red)](bg:peach)'
+format = '[$all_status$ahead_behind ]($style)'
 modified = "!"
 staged = "+"
 renamed = "»"
@@ -81,67 +109,54 @@ ahead = "⇡${count}"
 behind = "⇣${count}"
 diverged = "⇕±${count}"
 
-# --- Language stack — each on its own pill, sapphire color ---------
+# --- Language stack — sapphire chips, each on its own pill -------
 
 [nodejs]
 symbol = ""
 style = "bg:sapphire fg:crust"
-format = '[[ $symbol$version ](fg:crust bg:sapphire)](bg:yellow)'
+format = '[ $symbol$version ]($style)'
 
 [rust]
 symbol = ""
 style = "bg:sapphire fg:crust"
-format = '[[ $symbol$version ](fg:crust bg:sapphire)](bg:yellow)'
+format = '[ $symbol$version ]($style)'
 
 [python]
 symbol = ""
 style = "bg:sapphire fg:crust"
-format = '[[ $symbol$version ](fg:crust bg:sapphire)](bg:yellow)'
+format = '[ $symbol$version ]($style)'
 
 [golang]
 symbol = ""
 style = "bg:sapphire fg:crust"
-format = '[[ $symbol$version ](fg:crust bg:sapphire)](bg:yellow)'
+format = '[ $symbol$version ]($style)'
 
 [java]
 symbol = ""
 style = "bg:sapphire fg:crust"
-format = '[[ $symbol$version ](fg:crust bg:sapphire)](bg:yellow)'
+format = '[ $symbol$version ]($style)'
 
 [kotlin]
 symbol = ""
 style = "bg:sapphire fg:crust"
-format = '[[ $symbol$version ](fg:crust bg:sapphire)](bg:yellow)'
+format = '[ $symbol$version ]($style)'
 
 [ruby]
 symbol = ""
 style = "bg:sapphire fg:crust"
-format = '[[ $symbol$version ](fg:crust bg:sapphire)](bg:yellow)'
+format = '[ $symbol$version ]($style)'
 
 [php]
 symbol = ""
 style = "bg:sapphire fg:crust"
-format = '[[ $symbol$version ](fg:crust bg:sapphire)](bg:yellow)'
+format = '[ $symbol$version ]($style)'
 
-# --- Time pill (rightmost) -----------------------------------------
+# --- Time chip (rightmost, lavender) ------------------------------
 [time]
 disabled = false
 time_format = "%R"
 style = "bg:lavender fg:crust"
 format = '[ $time ]($style)'
-
-# --- Username pill (kept on left for now; move to right by adding to right_format) ---
-[username]
-show_always = true
-style_user = "bg:maroon fg:crust"
-style_root = "bg:red fg:crust"
-format = '[ $user ]($style)'
-
-# --- Hostname pill (kept on left for now) ---
-[hostname]
-ssh_only = false
-style = "bg:peach fg:crust"
-format = '[@$hostname]($style)'
 
 # --- Disabled (minimal prompt) -----------------------------------
 [memory_usage]
