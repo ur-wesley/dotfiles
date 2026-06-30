@@ -72,7 +72,7 @@ $wingetPackages = @(
     @{ id = "Docker.DockerDesktop";          name = "Docker Desktop" },
 
     # Runtime manager (node, python, go, rust, dotnet, bun, etc.)
-    @{ id = "jdxcode.mise";                  name = "mise (runtime manager)" },
+    @{ id = "jdx.mise";                      name = "mise (runtime manager)" },
 
     # Terminals — WezTerm (Catppuccin Mocha, blur) is the GPU-accelerated
     # alternative to Rio (Rust, simpler). Both share dotfiles/config/<x>/.
@@ -92,8 +92,7 @@ $wingetPackages = @(
     @{ id = "starship.starship";             name = "starship" },
     @{ id = "jesseduffield.lazygit";         name = "lazygit" },
     @{ id = "jesseduffield.lazydocker";      name = "lazydocker" },
-    @{ id = "tldr-pages.tldr";               name = "tldr" },
-    @{ id = "denisidoro.navi";               name = "navi" },
+    @{ id = "tldr-pages.tlrc";                name = "tldr" },
     @{ id = "atuinsh.atuin";                 name = "atuin" },
 
     # File management
