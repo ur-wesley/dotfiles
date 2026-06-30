@@ -4,24 +4,26 @@
 # Mirrors the omerxx/dotfiles structure: one tree, one install command.
 #
 # Usage (PowerShell, run as Administrator):
-#   irm https://raw.githubusercontent.com/<owner>/<repo>/main/install/install.ps1 | iex
+#   irm https://raw.githubusercontent.com/<owner>/<repo>/main/install/install.ps1 -OutFile $env:TEMP\install.ps1; & $env:TEMP\install.ps1
 #
 # Or, after downloading:
 #   .\install.ps1   (edit the variables below to customize)
 #
 # Requirements: Windows 10/11, internet, ~30 GB free disk.
 
-& {
-$Repo         = "ur-wesley/dotfiles"
-$Branch       = "main"
-$NixConfigDir = "$HOME\nix-config"
-$SkipNixOS    = $false
-$SkipRepos    = $false
-$SkipVSCode   = $false
-$SkipFonts    = $false
-$SkipStow     = $false
-$SkipWinget   = $false
-$Force        = $false
+[CmdletBinding()]
+param(
+    [string]$Repo = "ur-wesley/dotfiles",
+    [string]$Branch = "main",
+    [string]$NixConfigDir = "$HOME\nix-config",
+    [switch]$SkipNixOS = $false,
+    [switch]$SkipRepos = $false,
+    [switch]$SkipVSCode = $false,
+    [switch]$SkipFonts = $false,
+    [switch]$SkipStow = $false,
+    [switch]$SkipWinget = $false,
+    [switch]$Force = $false
+)
 
 $ErrorActionPreference = "Stop"
 $ProgressPreference   = "SilentlyContinue"
@@ -301,4 +303,3 @@ Write-Host "  Daily sync: re-run this script, or cd $NixConfigDir\dotfiles && ma
 Write-Host "  Inside WSL: cd ~/nix-config/dotfiles && make restow" -ForegroundColor DarkGray
 Write-Host ""
 Ok "All set. Welcome to the new box."
-} # end installer scriptblock
