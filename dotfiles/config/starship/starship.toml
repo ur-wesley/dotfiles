@@ -1,11 +1,14 @@
-# Wesley's starship config — omerxx-style.
-# Layout: minimal left prompt (just $directory + $character), everything
-# else on the right via $all. Catppuccin Mocha palette referenced by
-# name throughout.
+# Wesley's starship config — omerxx-style layout + Catppuccin Powerline
+# rendering. Each "badge" is a rounded pill: [[ text ](fg:prev_bg bg:self_bg)]
+# The powerline `▸` glyph bridges between pills with a smooth color
+# transition, giving the rounded-segment look from the Pastel Powerline
+# preset. Nerd Font required (JetBrainsMono Nerd Font).
 #
-# Inspired by https://github.com/omerxx/dotfiles
+# Inspired by:
+#   https://github.com/omerxx/dotfiles
+#   https://starship.rs/presets/pastel-powerline
+#
 # Apply changes from WSL: ~/nix-config/dotfiles/update.sh
-# Requires a Nerd Font for the powerline glyphs.
 
 "$schema" = "https://starship.rs/config-schema.json"
 add_newline = false
@@ -15,19 +18,13 @@ continuation_prompt = "[▸▸](bold blue)"
 
 palette = "catppuccin_mocha"
 
-# Minimal left prompt — directory chip + plain character arrow.
-# omerxx's signature structure: keep the left side empty, push
-# everything else to the right via $all.
+# Minimal left: directory pill + plain green prompt character.
+# Right: $all renders every other module as a rounded powerline pill.
 format = """$directory$character"""
-
-# Right side: every module renders as its own pill with powerline
-# transitions. $all is starship's catch-all variable that includes
-# every other module automatically.
 right_format = """$all"""
 
 # --- Prompt character ---------------------------------------------
 # Plain green text arrow — no chip, just the prompt symbol.
-# Same as omerxx's style: simple, no chrome.
 [character]
 success_symbol = '[➜](bold green)'
 error_symbol = '[➜](bold red)'
@@ -36,26 +33,28 @@ vimcmd_replace_symbol = "[R]>>>"
 vimcmd_replace_one_symbol = "[r]>>>"
 vimcmd_visual_symbol = "[V]>>>"
 
-# --- Directory pill (left side, first) -----------------------------
-# Blue bg, dark text — Catppuccin Mocha blue accent.
+# --- Directory pill (left, first) ---------------------------------
+# The Pastel Powerline trick: wrap the chip in [[ text ](fg:prev bg:self)]
+# so the right edge becomes a powerline arrow in the next color,
+# making the pill look "rounded" at the seam.
 [directory]
 style = "bg:blue fg:base bold"
-format = "[ $path ]($style)"
+format = '[[ $path ](fg:base bg:blue)](bg:yellow)'
 truncation_length = 3
 truncation_symbol = "…/"
 home_symbol = "~"
 read_only = " 🔒"
 
-# --- Git branch pill (yellow) -------------------------------------
+# --- Git branch pill ----------------------------------------------
 [git_branch]
 symbol = ""
 style = "bg:yellow fg:base bold"
-format = "[$symbol$branch(:$remote_branch)]($style)"
+format = '[[ $symbol$branch(:$remote_branch) ](fg:base bg:yellow)](bg:red)'
 
-# --- Git status pill (red) ----------------------------------------
+# --- Git status pill (red, only when dirty) -----------------------
 [git_status]
 style = "bg:red fg:base bold"
-format = "[$all_status$ahead_behind]($style)"
+format = '[[ $all_status$ahead_behind ](fg:base bg:red)](bg:sapphire)'
 modified = "!"
 staged = "+"
 renamed = "»"
@@ -65,47 +64,46 @@ ahead = "⇡${count}"
 behind = "⇣${count}"
 diverged = "⇕±${count}"
 
-# --- Language stack — sapphire accent, each on its own pill -------
-
+# --- Language stack — sapphire pills, powerline-wrapped ----------
 [nodejs]
 symbol = "⬢ "
 style = "bg:sapphire fg:base bold"
-format = "[$symbol$version]($style)"
+format = '[[ $symbol$version ](fg:base bg:sapphire)](bg:peach)'
 
 [rust]
 symbol = "🦀 "
 style = "bg:peach fg:base bold"
-format = "[$symbol$version]($style)"
+format = '[[ $symbol$version ](fg:base bg:peach)](bg:yellow)'
 
 [python]
 symbol = " "
 style = "bg:yellow fg:base bold"
-format = "[$symbol$version]($style)"
+format = '[[ $symbol$version ](fg:base bg:yellow)](bg:teal)'
 
 [golang]
 symbol = " "
 style = "bg:teal fg:base bold"
-format = "[$symbol$version]($style)"
+format = '[[ $symbol$version ](fg:base bg:teal)](bg:green)'
 
 [java]
 symbol = "☕ "
 style = "bg:red fg:base bold"
-format = "[$symbol$version]($style)"
+format = '[[ $symbol$version ](fg:base bg:red)](bg:lavender)'
 
 [kotlin]
 symbol = "🟪 "
 style = "bg:lavender fg:base bold"
-format = "[$symbol$version]($style)"
+format = '[[ $symbol$version ](fg:base bg:lavender)](bg:mauve)'
 
 [ruby]
 symbol = "💎 "
 style = "bg:red fg:base bold"
-format = "[$symbol$version]($style)"
+format = '[[ $symbol$version ](fg:base bg:red)](bg:maroon)'
 
 [php]
 symbol = "🐘 "
 style = "bg:lavender fg:base bold"
-format = "[$symbol$version]($style)"
+format = '[[ $symbol$version ](fg:base bg:lavender)](bg:sapphire)'
 
 # --- Time pill (rightmost) ---------------------------------------
 [time]
@@ -119,8 +117,7 @@ format = "[ $time ]($style)"
 disabled = true
 
 # ============================================================================
-# Palette — Catppuccin Mocha.
-# Used as `bg:NAME` / `fg:NAME` in module style strings above.
+# Palette — Catppuccin Mocha. Referenced as bg:NAME / fg:NAME above.
 # ============================================================================
 [palettes.catppuccin_mocha]
 rosewater = "#f5e0dc"
