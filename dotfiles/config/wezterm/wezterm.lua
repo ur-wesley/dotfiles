@@ -57,7 +57,7 @@ local mocha = {
 --   * macOS:   macos_window_background_blur = 35  (integer pixel radius)
 -- There is no cross-platform `window_background_blur`; setting it is a
 -- hard error. 0.78 opacity + Acrylic = strong frosted-glass on Win.
-config.window_decorations = 'RESIZE'        -- clean borderless title bar
+config.window_decorations = 'TITLE | RESIZE'  -- native title bar + resize border
 config.window_background_opacity = 0.78     -- stronger frost: more desktop
                                               -- shows through
 config.win32_system_backdrop = 'Acrylic'    -- Win 10/11 DWM blur
@@ -179,7 +179,7 @@ config.launch_menu = {
 
 -- ---- Key bindings ------------------------------------------------------
 -- Readline-ish; line up with Rio's [key_bindings] notes.
-config.key_bindings = {
+config.keys = {
   -- Ctrl+Shift+C / Ctrl+Shift+V for copy/paste.
   { key = 'c', mods = 'SHIFT|CTRL', action = wezterm.action.CopyTo 'Clipboard' },
   { key = 'v', mods = 'SHIFT|CTRL', action = wezterm.action.PasteFrom 'Clipboard' },
