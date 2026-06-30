@@ -285,7 +285,7 @@ if (-not $SkipNixOS -and -not $SkipRepos) {
             Warn "NixOS rebuild failed; check output above"
         }
     } else {
-        Warn "NixOS distro not registered; run this script with -SkipNixOS:`$false`"
+        Warn "NixOS distro not registered; run this script with -SkipNixOS:`$false"
     }
 }
 
