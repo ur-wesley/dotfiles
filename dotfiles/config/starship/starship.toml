@@ -1,79 +1,90 @@
-# Wesley's starship config — Catppuccin Mocha with full background chips + icons.
+# Wesley's starship config — Catppuccin Powerline (Mocha flavor).
+# Adapted from the official starship Catppuccin Powerline preset.
 # Shared between home-manager (Nix) and stow (Windows).
-# Literal $ characters are intentional — starship uses them for module
-# references. Don't escape them.
-#
-# Chip design:
-#   - Each module renders as `[ icon text ](bg:accent fg:text)` — a filled
-#     block with bracket characters rendered as solid powerline separators
-#     when a Nerd Font is active, creating the rounded "chip" appearance.
-#   - Each chip has a leading Nerd Font icon (folder, branch, clock, etc).
-#   - Catppuccin Mocha accents for backgrounds, dark text for contrast.
 #
 # Apply changes from WSL:
 #   ~/nix-config/dotfiles/update.sh
+#
+# Requires a Nerd Font (JetBrainsMono Nerd Font) for the powerline glyphs.
 
 "$schema" = "https://starship.rs/config-schema.json"
 command_timeout = 1000
 scan_timeout = 5000
 continuation_prompt = "[▸▸](bold blue)"
 
-# Left: identity chips (character → username → host → cwd).
-# Right: status chips (git → languages → time).
-format = """$character$username$hostname$directory """
-right_format = """$git_branch$git_status$nodejs$rust$python$java$kotlin$ruby$php$golang $time """
+# Use the bundled Catppuccin Mocha palette — colors are referenced by
+# name (e.g. `bg:peach`) throughout this file.
+palette = 'catppuccin_mocha'
 
-# --- Prompt arrow chip ------------------------------------------
-# Lavender chip with dark text — the visible prompt character.
+# Powerline format: each chip ends with a `(bg:prev_fg:next)` separator
+# so adjacent chips connect with a smooth color transition. The `[`
+# chars are the powerline "right-pointing" transitions drawn by your
+# Nerd Font; the `(...)` parts are the colored backgrounds.
+#
+# Left:   character → username → host → directory
+# Right:  git → languages → time
+format = """
+[](fg:lavender)\
+$character\
+[](fg:lavender bg:maroon)\
+$username\
+[](fg:maroon bg:peach)\
+$hostname\
+[](fg:peach bg:green)\
+$directory\
+[](fg:green bg:yellow)\
+$git_branch\
+$git_status\
+[](fg:yellow bg:sapphire)\
+$nodejs\
+$rust\
+$python\
+$java\
+$golang\
+$kotlin\
+$ruby\
+$php\
+[](fg:sapphire bg:lavender)\
+$time"""
+
+# --- Prompt arrow (chip) ------------------------------------------
+# Plain colored arrow, not a chip — sits left of the username.
 [character]
-success_symbol = "❯"
-error_symbol = "❯"
-vimcmd_symbol = "❮"
-vimcmd_visual_symbol = "❮"
-vimcmd_replace_symbol = "❮"
-vimcmd_replace_one_symbol = "❮"
-format = "[ $symbol ](bg:#cba6f7 fg:#1e1e2e bold) "
 disabled = false
+success_symbol = '[❯](bold fg:green)'
+error_symbol = '[❯](bold fg:red)'
 
-# --- Username chip ---------------------------------------------
-# Surface1 background, pink foreground. Root user gets a red chip.
+# --- Username chip ----------------------------------------------
 [username]
-style_user = "bg:#45475a fg:#f5c2e7 bold"
-style_root = "bg:#f38ba8 fg:#1e1e2e bold"
-format = "[  $user ]($style) "
 show_always = true
-disabled = false
+style_user = "bg:maroon fg:crust"
+style_root = "bg:red fg:crust"
+format = '[ $user ]($style)'
 
-# --- Hostname chip ---------------------------------------------
-# Surface1 background, teal foreground. Server icon prefix.
+# --- Hostname chip ----------------------------------------------
 [hostname]
 ssh_only = false
-style = "bg:#45475a fg:#94e2d5 bold"
-format = "[@  $hostname ]($style) "
-disabled = false
+style = "bg:peach fg:crust"
+format = '[@$hostname]($style)'
 
 # --- Directory chip --------------------------------------------
-# Blue background, dark foreground. Nerd Font folder icon prefix.
 [directory]
-style = "bg:#89b4fa fg:#1e1e2e bold"
-format = "[  $path ]($style) "
+style = "bg:green fg:crust"
+format = "[ $path ]($style)"
 truncation_length = 3
 truncation_symbol = "…/"
 home_symbol = "~"
-read_only = "  🔒"
+read_only = " 🔒"
 
-# --- Git branch chip -------------------------------------------
-# Peach background, dark foreground. Nerd Font git-branch icon prefix.
+# --- Git branch + status (yellow chip) -------------------------
 [git_branch]
 symbol = ""
-style = "bg:#fab387 fg:#1e1e2e bold"
-format = "[$symbol $branch]($style) "
+style = "bg:yellow fg:crust"
+format = '[[ $symbol$branch ](fg:crust bg:yellow)]($style)'
 
-# --- Git status chip -------------------------------------------
-# Red background when there are changes, dark foreground.
 [git_status]
-style = "bg:#f38ba8 fg:#1e1e2e bold"
-format = "[ $all_status$ahead_behind ]($style) "
+style = "bg:yellow fg:crust"
+format = '[[($all_status$ahead_behind )](fg:crust bg:yellow)]($style)'
 modified = "!"
 staged = "+"
 renamed = "»"
@@ -83,57 +94,88 @@ ahead = "⇡${count}"
 behind = "⇣${count}"
 diverged = "⇕±${count}"
 
-# --- Language stack chips --------------------------------------
-# Each language gets its own Nerd Font icon + Catppuccin Mocha accent.
+# --- Language stack (green chip, all together) ------------------
+# Each language gets its own Nerd Font icon + version in one green block.
 
 [nodejs]
-symbol = "⬢ "
-style = "bg:#a6e3a1 fg:#1e1e2e bold"
-format = "[$symbol$version]($style) "
+symbol = ""
+style = "bg:green fg:crust"
+format = '[[ $symbol$version ](fg:crust bg:green)]($style)'
 
 [rust]
-symbol = "🦀 "
-style = "bg:#fab387 fg:#1e1e2e bold"
-format = "[$symbol$version]($style) "
-
-[golang]
 symbol = ""
-style = "bg:#94e2d5 fg:#1e1e2e bold"
-format = "[$symbol $version]($style) "
+style = "bg:green fg:crust"
+format = '[[ $symbol$version ](fg:crust bg:green)]($style)'
 
 [python]
 symbol = ""
-style = "bg:#f9e2af fg:#1e1e2e bold"
-format = "[$symbol $version]($style) "
+style = "bg:green fg:crust"
+format = '[[ $symbol$version ](fg:crust bg:green)]($style)'
 
 [java]
-symbol = "☕ "
-style = "bg:#f38ba8 fg:#1e1e2e bold"
-format = "[$symbol$version]($style) "
+symbol = ""
+style = "bg:green fg:crust"
+format = '[[ $symbol$version ](fg:crust bg:green)]($style)'
+
+[golang]
+symbol = ""
+style = "bg:green fg:crust"
+format = '[[ $symbol$version ](fg:crust bg:green)]($style)'
 
 [kotlin]
-symbol = "🟪 "
-style = "bg:#b4befe fg:#1e1e2e bold"
-format = "[$symbol$version]($style) "
+symbol = ""
+style = "bg:green fg:crust"
+format = '[[ $symbol$version ](fg:crust bg:green)]($style)'
 
 [ruby]
-symbol = "💎 "
-style = "bg:#f38ba8 fg:#1e1e2e bold"
-format = "[$symbol$version]($style) "
+symbol = ""
+style = "bg:green fg:crust"
+format = '[[ $symbol$version ](fg:crust bg:green)]($style)'
 
 [php]
-symbol = "🐘 "
-style = "bg:#b4befe fg:#1e1e2e bold"
-format = "[$symbol$version]($style) "
+symbol = ""
+style = "bg:green fg:crust"
+format = '[[ $symbol$version ](fg:crust bg:green)]($style)'
 
-# --- Time chip (rightmost, always visible) --------------------
-# Red chip — pops against the Catppuccin Mocha palette. Clock icon prefix.
+# --- Time chip (rightmost, sapphire → lavender separator) --------
 [time]
-style = "bg:#f38ba8 fg:#1e1e2e bold"
-format = "[  $time ]($style)"
-time_format = "%R"
 disabled = false
+time_format = "%R"
+style = "bg:lavender fg:crust"
+format = '[ $time ]($style)'
 
-# --- Disabled (kept off to stay minimal) -----------------------
+# --- Disabled (minimal prompt) ---------------------------------
 [memory_usage]
 disabled = true
+
+# ============================================================================
+# Palette — Catppuccin Mocha (from catppuccin/starship preset).
+# Colors are referenced throughout the config as e.g. `bg:peach fg:crust`.
+# ============================================================================
+[palettes.catppuccin_mocha]
+rosewater = "#f5e0dc"
+flamingo  = "#f2cdcd"
+pink      = "#f5c2e7"
+mauve     = "#cba6f7"
+red       = "#f38ba8"
+maroon    = "#eba0ac"
+peach     = "#fab387"
+yellow    = "#f9e2af"
+green     = "#a6e3a1"
+teal      = "#94e2d5"
+sky       = "#89dceb"
+sapphire  = "#74c7ec"
+blue      = "#89b4fa"
+lavender  = "#b4befe"
+text      = "#cdd6f4"
+subtext1  = "#bac2de"
+subtext0  = "#a6adc8"
+overlay2  = "#9399b2"
+overlay1  = "#7f849c"
+overlay0  = "#6c7086"
+surface2  = "#585b70"
+surface1  = "#45475a"
+surface0  = "#313244"
+base      = "#1e1e2e"
+mantle    = "#181825"
+crust     = "#11111b"
