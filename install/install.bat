@@ -28,8 +28,10 @@ if %errorlevel% neq 0 (
 
 REM Download + run the PowerShell installer
 set PSURL=https://raw.githubusercontent.com/%REPO%/%BRANCH%/install/install.ps1
+set PSFILE=%TEMP%\install.ps1
 echo Downloading %PSURL% ...
-powershell -NoProfile -ExecutionPolicy Bypass -Command "irm '%PSURL%' -Repo '%REPO%' -Branch '%BRANCH%' | iex"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "irm '%PSURL%' -OutFile '%PSFILE%'"
+powershell -NoProfile -ExecutionPolicy Bypass -File "%PSFILE%" -Repo "%REPO%" -Branch "%BRANCH%"
 
 if %errorlevel% neq 0 (
     echo.

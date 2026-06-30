@@ -1,7 +1,7 @@
-# Wesley's config sync — stow-driven, omerxx-style.
+# Wesley's config sync — symlink-driven dotfiles + NixOS rebuild.
 # Run from PowerShell (no admin needed). Will:
 #   1. git pull in the nix-config repo
-#   2. stow --restow config home into $HOME (Windows-side)
+#   2. symlink dotfiles into $HOME (Windows-side)
 #   3. trigger nixos-rebuild inside WSL (Linux-side)
 #
 # Inside WSL, run: cd ~/nix-config/dotfiles && make restow && nrs
@@ -18,6 +18,24 @@ function Step($msg) { Write-Host "`n==> $msg" -ForegroundColor Cyan }
 function Ok($msg)   { Write-Host "  [OK] $msg" -ForegroundColor Green }
 function Warn($msg) { Write-Host "  [WARN] $msg" -ForegroundColor Yellow }
 
+function Invoke-DotfileSymlinks {
+    param([string]$Source, [string]$Target)
+    foreach ($item in Get-ChildItem -Path $Source) {
+        $link = Join-Path $Target $item.Name
+        if (Test-Path $link) {
+            $existing = Get-Item $link -Force
+            if ($existing.Attributes -band [IO.FileAttributes]::ReparsePoint) {
+                Remove-Item $link -Force
+            } else {
+                Warn "  $link exists and is not a symlink; skipping"
+                continue
+            }
+        }
+        New-Item -ItemType SymbolicLink -Path $link -Target $item.FullName | Out-Null
+        Ok "  $link -> $($item.FullName)"
+    }
+}
+
 # 1. Git pull
 Step "Updating nix-config in $NixConfigDir"
 if (-not (Test-Path $NixConfigDir)) {
@@ -32,20 +50,17 @@ if (-not (Test-Path $NixConfigDir)) {
 }
 Ok "nix-config is on origin/$Branch"
 
-# 2. Stow Windows-side dotfiles
-Step "Stowing dotfiles into $HOME"
+# 2. Symlink Windows-side dotfiles
+Step "Symlinking dotfiles into $HOME"
 $dotfilesDir = Join-Path $NixConfigDir "dotfiles"
 if (Test-Path $dotfilesDir) {
-    Push-Location $dotfilesDir
-    if (Get-Command stow -ErrorAction SilentlyContinue) {
-        stow --target=$HOME --restow config home
-        Ok "stow --restow config home → $HOME"
-    } else {
-        Warn "stow not on PATH. Install via: scoop install stow"
-    }
-    Pop-Location
+    $configDir = Join-Path $HOME ".config"
+    if (-not (Test-Path $configDir)) { New-Item -ItemType Directory -Path $configDir | Out-Null }
+    Invoke-DotfileSymlinks -Source "$dotfilesDir\config" -Target $configDir
+    Invoke-DotfileSymlinks -Source "$dotfilesDir\home" -Target $HOME
+    Ok "dotfiles symlinked into $HOME"
 } else {
-    Warn "$dotfilesDir not found; skipping stow"
+    Warn "$dotfilesDir not found; skipping symlinks"
 }
 
 # 3. NixOS rebuild inside WSL (the Linux-side apply)

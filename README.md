@@ -14,12 +14,12 @@ files.
 
 ```powershell
 # Right-click PowerShell, "Run as Administrator"
-irm https://raw.githubusercontent.com/ur-wesley/dotfiles/main/install/install.ps1 | iex
+irm https://raw.githubusercontent.com/ur-wesley/dotfiles/main/install/install.ps1 -OutFile $env:TEMP\install.ps1; & $env:TEMP\install.ps1
 ```
 
 This installs winget packages (PowerShell 7, VS Code, dev CLIs, etc.),
-scoop + stow, JetBrainsMono Nerd Font, NixOS-WSL, and stows the
-dotfiles into `$HOME`. After it finishes:
+JetBrainsMono Nerd Font, NixOS-WSL, and symlinks the dotfiles into
+`$HOME` (native PowerShell symlinks, no stow needed on Windows). After it finishes:
 
 1. Open Windows Terminal — the NixOS profile drops you into fish in WSL.
 2. Inside the WSL shell, run `nrs` (alias for `sudo nixos-rebuild switch`).
@@ -28,10 +28,10 @@ dotfiles into `$HOME`. After it finishes:
 ### Daily sync (Windows)
 
 ```powershell
-irm https://raw.githubusercontent.com/ur-wesley/dotfiles/main/install/sync.ps1 | iex
+irm https://raw.githubusercontent.com/ur-wesley/dotfiles/main/install/sync.ps1 -OutFile $env:TEMP\sync.ps1; & $env:TEMP\sync.ps1
 ```
 
-Pulls latest, restows on Windows, rebuilds NixOS in WSL.
+Pulls latest, re-symlinks on Windows, rebuilds NixOS in WSL.
 
 ### Daily sync (inside WSL)
 
@@ -60,10 +60,10 @@ nix-config/
 │   ├── install.ps1                 # one-shot Windows installer (winget + scoop + stow + WSL)
 │   ├── install.bat                 # .bat wrapper for double-click
 │   └── sync.ps1                    # pull latest + restow + nixos-rebuild
-├── dotfiles/                       # stow-driven dotfiles (shared Nix ↔ Windows)
+├── dotfiles/                       # dotfiles (shared Nix ↔ Windows)
 │   ├── Makefile                    # make stow | unstow | restow | adopt
 │   ├── stow.sh                     # bash wrapper around stow
-│   ├── config/                     # → ~/.config/* via `stow --target=$HOME config`
+│   ├── config/                     # → ~/.config/* (symlinks on Windows, nix on WSL)
 │   │   ├── git/{config,ignore,attributes}
 │   │   ├── mise/config.toml
 │   │   ├── navi/welcome.yaml
@@ -71,7 +71,7 @@ nix-config/
 │   │   ├── television/{config.toml,channels/}
 │   │   ├── windows-terminal/settings.json
 │   │   └── zellij/{config.yaml,themes/,layouts/}
-│   └── home/                       # → ~/* via `stow --target=$HOME home`
+│   └── home/                       # → ~/* (symlinks on Windows, nix on WSL)
 │       └── powershell/Microsoft.PowerShell_profile.ps1
 └── home/wesley/                    # home-manager modules (Nix-side, read dotfiles/config/*)
     ├── core.nix                    # starship, fzf, zoxide, direnv, atuin, mcfly
@@ -91,10 +91,10 @@ nix-config/
 
 Each file in `dotfiles/config/` is a single source of truth:
 
-- **Windows side**: stow symlinks it directly into `%USERPROFILE%\.config\`.
+- **Windows side**: installer symlinks it directly into `%USERPROFILE%\.config\` (native `New-Item -ItemType SymbolicLink`).
 - **WSL side**: home-manager's `xdg.configFile."x".source = ../../dotfiles/config/x;` symlinks it via the Nix store.
 
-Both pointers reach the same file. To edit, change the dotfile and run `make restow` (and `nrs` for the Nix side).
+Both pointers reach the same file. To edit, change the dotfile and run `make restow` inside WSL (and `nrs` for the Nix side). On Windows, re-run `install.ps1` or `sync.ps1` to refresh symlinks.
 
 ## Terminal
 
@@ -232,7 +232,7 @@ cd ~/nix-config/dotfiles && make restow
 nrs
 
 # Or from Windows PowerShell
-irm https://raw.githubusercontent.com/ur-wesley/dotfiles/main/install/sync.ps1 | iex
+irm https://raw.githubusercontent.com/ur-wesley/dotfiles/main/install/sync.ps1 -OutFile $env:TEMP\sync.ps1; & $env:TEMP\sync.ps1
 ```
 
 ### Update inputs
@@ -274,11 +274,11 @@ Then `nrs`.
 
 Edit `hosts/nixos-wsl/configuration.nix` and add to `environment.systemPackages`. For things that need to be available system-wide (currently kept minimal — vim, git, sudo, etc.).
 
-### Add a new stow package
+### Add a new dotfiles package
 
 1. Create `dotfiles/<package>/` mirroring the target filesystem layout.
-2. Add `<package>` to `PACKAGES` in `dotfiles/Makefile`.
-3. Add the package to `stow --target=$HOME` invocations in `install/install.ps1` and `install/sync.ps1`.
+2. Add `<package>` to `PACKAGES` in `dotfiles/Makefile` (for WSL-side stow).
+3. The Windows installer/sync scripts auto-symlink everything in `dotfiles/config/` and `dotfiles/home/` — no changes needed unless you add a new top-level directory.
 
 ### Add a new neovim plugin
 
@@ -295,14 +295,14 @@ Edit `home/wesley/nvim.nix` and add to `programs.nixvim.plugins.<name>`. If the 
 | Path | Lives in |
 |---|---|
 | `~/nix-config` | symlink → `C:\Users\parac\nix-config` (Windows NTFS) |
-| `~/.config/starship.toml` | stow symlink → `~/nix-config/dotfiles/config/starship/starship.toml` |
-| `~/.config/zellij/*` | stow symlink → `~/nix-config/dotfiles/config/zellij/*` |
-| `~/.config/git/*` | stow symlink → `~/nix-config/dotfiles/config/git/*` |
-| `~/.config/television/*` | stow symlink → `~/nix-config/dotfiles/config/television/*` |
+| `~/.config/starship.toml` | symlink → `~/nix-config/dotfiles/config/starship/starship.toml` |
+| `~/.config/zellij/*` | symlink → `~/nix-config/dotfiles/config/zellij/*` |
+| `~/.config/git/*` | symlink → `~/nix-config/dotfiles/config/git/*` |
+| `~/.config/television/*` | symlink → `~/nix-config/dotfiles/config/television/*` |
 | `~/.config/nvim` | generated by nixvim into `/nix/store/...` |
-| `~/Documents/PowerShell/Microsoft.PowerShell_profile.ps1` | stow symlink → `~/nix-config/dotfiles/home/powershell/...` |
-| Windows Terminal settings | `dotfiles/config/windows-terminal/settings.json` → stow syncs into `%LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\` |
-| `%USERPROFILE%\.config\mise\config.toml` | stow symlink → `~/nix-config/dotfiles/config/mise/config.toml` |
+| `~/Documents/PowerShell/Microsoft.PowerShell_profile.ps1` | symlink → `~/nix-config/dotfiles/home/powershell/...` |
+| Windows Terminal settings | `dotfiles/config/windows-terminal/settings.json` → symlinked into `%LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\` |
+| `%USERPROFILE%\.config\mise\config.toml` | symlink → `~/nix-config/dotfiles/config/mise/config.toml` |
 
 ## Useful references
 
