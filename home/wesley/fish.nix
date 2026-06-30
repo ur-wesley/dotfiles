@@ -264,13 +264,23 @@
       # Auto-launch zellij on login shells (SSH, fresh WSL window).
       # Critical: skip when zellij itself spawned this shell, otherwise
       # every new zellij tab recursively tries to attach → new tab kills
-      # itself. zellij sets ZELLIJ_PANE_ID in every spawned shell, so
-      # checking for that (or ZELLIJ_SESSION_NAME) is the safe gate.
-      if set -q ZELLIJ_PANE_ID
-        # already inside a zellij pane — don't auto-launch
-      else if set -q ZELLIJ_SESSION_NAME
-        # also already inside zellij, skip
-      else if command -v zellij >/dev/null
+      # itself. We detect "inside zellij" by walking the parent
+      # process tree via /proc — env-var based detection is unreliable
+      # because the zellij server may not always export ZELLIJ_* vars
+      # to the spawned pane's shell (e.g. when no-auto-start is used
+      # or when zellij drops the env on exec).
+      set -l in_zellij no
+      if test -r /proc/self/status
+        set -l ppid (cat /proc/self/status | string match -r "PPid:\s+(\d+)" '$1' | head -1)
+        if test -n "$ppid"
+          for pid in $ppid (cat /proc/$ppid/status 2>/dev/null | string match -r "PPid:\s+(\d+)" '$1' | head -1)
+            test "$pid" = 1; and break
+            set -l comm (cat /proc/$pid/comm 2>/dev/null | string trim)
+            string match -q -- "zellij*" -- $comm; and set in_zellij yes; and break
+          end
+        end
+      end
+      if test "$in_zellij" = no; and command -v zellij >/dev/null
         set -l s (zellij list-sessions --short 2>/dev/null | string collect)
         if test -n "$s"
           exec zellij attach "$s[1]"
