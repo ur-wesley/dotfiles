@@ -1,0 +1,77 @@
+// Wesley's zellij config — single-pane default, Catppuccin Mocha theme.
+// Shared between home-manager (Nix) and stow (Windows).
+// KDL format: https://kdl.dev
+// Docs: https://zellij.dev/documentation/
+
+// Quit cleanly when terminal closes (default is detach; we prefer quit so
+// session state doesn't pile up across reboots in WSL).
+on_force_close "quit"
+
+// Send a request for a simplified ui (without arrow fonts) to plugins.
+// Matches rio-style minimalism.
+simplified_ui true
+
+// Pane frames on, with the theme's muted color making them subtle.
+pane_frames true
+
+// Toggle enabling the mouse mode. Off in WSL to avoid interfering with text
+// selection from inside Rio/Windows Terminal.
+mouse_mode true
+
+// Bind scrollback editor to neovim (via the Nix store on NixOS-WSL).
+// Falls back to $EDITOR if the path doesn't exist.
+scrollback_editor "/run/current-system/sw/bin/nvim"
+
+// 10k lines of scrollback per pane.
+scroll_buffer_size 10000
+
+// Don't copy on select — copy is explicit (matches fish/rio preference).
+copy_on_select false
+
+// Copy through clip.exe on WSL (Windows host's clipboard).
+// On Linux, OSC 52 is used by default.
+copy_command "clip.exe"
+copy_clipboard "system"
+
+// Default shell for new panes — fish.
+default_shell "fish"
+
+// Mirror terminal — works correctly with Rio/Windows Terminal.
+mirror_session true
+
+// Use the bundled dev layout on startup (single pane + bottom tab bar).
+default_layout "dev"
+
+// Default mode on startup: normal (full keybindings available).
+default_mode "normal"
+
+// The folder in which Zellij will look for layouts.
+// Relative to the user's home directory or absolute.
+layout_dir "/home/wesley/nix-config/dotfiles/config/zellij/layouts"
+
+// The folder in which Zellij will look for themes.
+theme_dir "/home/wesley/nix-config/dotfiles/config/zellij/themes"
+
+// Choose the theme — references a file in theme_dir.
+// File: themes/catppuccin-mocha.kdl
+theme "catppuccin-mocha"
+
+// Plugins are bundled with zellij — just declare what we want.
+plugins {
+    tab-bar { path "tab-bar"; }
+    status-bar { path "status-bar"; }
+    strider { path "strider"; }
+    compact-bar { path "compact-bar"; }
+}
+
+// Keybindings — keep defaults (don't `clear-defaults=true`).
+// Override any binding you want to change; comment the upstream default.
+// The default keybindings are well-designed for the rio-style minimalism
+// we want; no need to reinvent them.
+keybinds {
+    // Uncomment to override the default copy binding (since copy_on_select=false
+    // disables automatic copy):
+    // normal {
+    //     bind "Alt c" { Copy; }
+    // }
+}
