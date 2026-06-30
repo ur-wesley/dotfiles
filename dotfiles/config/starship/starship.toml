@@ -1,10 +1,9 @@
-# Wesley's starship config — omerxx-style layout + explicit powerline
-# rounded pills. Each badge uses literal ▸ chars between modules for the
-# rounded connecting arrow, so the effect is visible even on fonts
-# without powerline glyphs. Catppuccin Mocha palette throughout.
+# Wesley's starship config — minimal, no background colors.
+# Layout: directory + character on left, every status module on right
+# via $all. Catppuccin Mocha colors used as text fg only (no bg fills).
 #
 # Apply changes from WSL: ~/nix-config/dotfiles/update.sh
-# Nerd Font recommended (JetBrainsMono Nerd Font) for best appearance.
+# Nerd Font recommended for the language module icons.
 
 "$schema" = "https://starship.rs/config-schema.json"
 add_newline = false
@@ -14,15 +13,13 @@ continuation_prompt = "[▸▸](bold blue)"
 
 palette = "catppuccin_mocha"
 
-# Minimal left: directory pill + plain green prompt character.
-# Right: every other module as a rounded powerline pill, chained with
-# explicit `▸` separators colored by the previous pill's bg.
+# Minimal left: directory + plain green prompt character.
+# Right: $all — every other module rendered with fg color only.
 format = """$directory$character"""
-right_format = """
-$git_branch▸$git_status▸$nodejs▸$rust▸$python▸$golang▸$time
-"""
+right_format = """$all"""
 
 # --- Prompt character ---------------------------------------------
+# Plain green text arrow (no chip).
 [character]
 success_symbol = '[➜](bold green)'
 error_symbol = '[➜](bold red)'
@@ -31,25 +28,28 @@ vimcmd_replace_symbol = "[R]>>>"
 vimcmd_replace_one_symbol = "[r]>>>"
 vimcmd_visual_symbol = "[V]>>>"
 
-# --- Directory pill (left, first) ---------------------------------
+# --- Directory (left, first) --------------------------------------
+# Just fg color — text only, no chip background.
 [directory]
-style = "bg:blue fg:base bold"
-format = "[ $path ]($style)"
+style = "fg:blue bold"
+format = "[$path]($style)"
 truncation_length = 3
 truncation_symbol = "…/"
 home_symbol = "~"
 read_only = " 🔒"
 
-# --- Git branch pill (yellow) -------------------------------------
+# --- Git branch -----------------------------------------------------
+# Yellow text — no bg.
 [git_branch]
 symbol = ""
-style = "bg:yellow fg:base bold"
-format = "[$symbol$branch]($style)"
+style = "fg:yellow bold"
+format = "[$symbol$branch(:$remote_branch) ]($style)"
 
-# --- Git status pill (red, only when dirty) -----------------------
+# --- Git status -----------------------------------------------------
+# Red text — no bg.
 [git_status]
-style = "bg:red fg:base bold"
-format = "[$all_status$ahead_behind]($style)"
+style = "fg:red bold"
+format = "[$all_status$ahead_behind ]($style)"
 modified = "!"
 staged = "+"
 renamed = "»"
@@ -59,65 +59,60 @@ ahead = "⇡${count}"
 behind = "⇣${count}"
 diverged = "⇕±${count}"
 
-# --- Language stack — sapphire pills -----------------------------
-# Use `[[ ▸ ... ]](fg:prev_bg bg:self_bg)` so the leading `[[ ▸` is a
-# rounded left edge in the previous pill's color, and the `]](bg:next)`
-# is a rounded right edge in the next pill's color. Together they
-# create the "rounded powerline pill" look from the Pastel Powerline
-# preset, with the `▸` glyph visible as the connector.
+# --- Language stack — each in its own fg color, no chip ----------
 [nodejs]
 symbol = "⬢ "
-style = "bg:sapphire fg:base bold"
-format = "[[ ▸ $symbol$version ](fg:yellow bg:sapphire)](bg:peach)"
+style = "fg:green bold"
+format = "[$symbol$version ]($style)"
 
 [rust]
 symbol = "🦀 "
-style = "bg:peach fg:base bold"
-format = "[[ ▸ $symbol$version ](fg:sapphire bg:peach)](bg:yellow)"
+style = "fg:peach bold"
+format = "[$symbol$version ]($style)"
 
 [python]
 symbol = " "
-style = "bg:yellow fg:base bold"
-format = "[[ ▸ $symbol$version ](fg:peach bg:yellow)](bg:teal)"
+style = "fg:yellow bold"
+format = "[$symbol$version ]($style)"
 
 [golang]
 symbol = " "
-style = "bg:teal fg:base bold"
-format = "[[ ▸ $symbol$version ](fg:yellow bg:teal)](bg:green)"
+style = "fg:teal bold"
+format = "[$symbol$version ]($style)"
 
 [java]
 symbol = "☕ "
-style = "bg:red fg:base bold"
-format = "[[ ▸ $symbol$version ](fg:sapphire bg:red)](bg:lavender)"
+style = "fg:red bold"
+format = "[$symbol$version ]($style)"
 
 [kotlin]
 symbol = "🟪 "
-style = "bg:lavender fg:base bold"
-format = "[[ ▸ $symbol$version ](fg:red bg:lavender)](bg:mauve)"
+style = "fg:lavender bold"
+format = "[$symbol$version ]($style)"
 
 [ruby]
 symbol = "💎 "
-style = "bg:red fg:base bold"
-format = "[[ ▸ $symbol$version ](fg:lavender bg:red)](bg:maroon)"
+style = "fg:red bold"
+format = "[$symbol$version ]($style)"
 
 [php]
 symbol = "🐘 "
-style = "bg:lavender fg:base bold"
-format = "[[ ▸ $symbol$version ](fg:red bg:lavender)](bg:sapphire)"
+style = "fg:lavender bold"
+format = "[$symbol$version ]($style)"
 
-# --- Time pill (rightmost, lavender) ------------------------------
+# --- Time pill (rightmost) ---------------------------------------
 [time]
 disabled = false
 time_format = "%R"
-style = "bg:lavender fg:base bold"
-format = "[ $time ]($style)"
+style = "fg:lavender bold"
+format = "[$time]($style)"
 
 # --- Disabled (minimal prompt) ----------------------------------
 [memory_usage]
 disabled = true
 
 # ============================================================================
-# Palette — Catppuccin Mocha. Referenced as bg:NAME / fg:NAME above.
+# Palette — Catppuccin Mocha. Referenced as fg:NAME / bg:NAME above.
 # ============================================================================
 [palettes.catppuccin_mocha]
 rosewater = "#f5e0dc"

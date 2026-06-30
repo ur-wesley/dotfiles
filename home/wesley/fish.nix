@@ -143,7 +143,12 @@
       oc = "opencode";
       gentle = "gentle-ai";
       tv = "tv";
-      zj = "zellij attach --create";
+      # Attach to the most recent zellij session, or create a new one.
+      # Inline so the shell alias is self-contained (no function call).
+      # `zellij list-sessions --short` prints one name per line;
+      # piping through `head -n 1` picks the first/most-recent; if
+      # there are no sessions, `zellij attach --create` makes a new one.
+      zj = "set -l s (zellij list-sessions --short 2>/dev/null | string collect); if test -n \"$s\"; zellij attach $s[1]; else; zellij attach --create; end";
 
       # Cheatsheets
       cheat = "navi";
@@ -243,6 +248,19 @@
       for sudo_path in /nix/store/*-sudo*/bin/sudo /nix/store/*-sudo-rs*/bin/sudo
         if test -f "$sudo_path"; and not test -u "$sudo_path"
           sudo -n true 2>/dev/null; or command sudo -n chmod 4755 "$sudo_path" 2>/dev/null
+        end
+      end
+
+      # Auto-launch zellij on login shells (SSH, fresh WSL window).
+      # Skip if we are already inside a zellij session.
+      if set -q ZELLIJ_SESSION_NAME
+        # already inside a zellij session, nothing to do
+      else if command -v zellij >/dev/null
+        set -l s (zellij list-sessions --short 2>/dev/null | string collect)
+        if test -n "$s"
+          exec zellij attach "$s[1]"
+        else
+          exec zellij attach --create
         end
       end
     '';
