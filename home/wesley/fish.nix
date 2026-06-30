@@ -143,12 +143,9 @@
       oc = "opencode";
       gentle = "gentle-ai";
       tv = "tv";
-      # Attach to the most recent zellij session, or create a new one.
-      # Inline so the shell alias is self-contained (no function call).
-      # `zellij list-sessions --short` prints one name per line;
-      # piping through `head -n 1` picks the first/most-recent; if
-      # there are no sessions, `zellij attach --create` makes a new one.
-      zj = "set -l s (zellij list-sessions --short 2>/dev/null | string collect); if test -n \"$s\"; zellij attach $s[1]; else; zellij attach --create; end";
+      # `zj` is a function (see functions below), not an alias — aliases
+      # get $argv auto-appended which breaks the trailing `end`.
+      # Use plain `zellij attach --create` for an explicit new session.
 
       # Cheatsheets
       cheat = "navi";
@@ -170,6 +167,12 @@
 
     # Functions (fish functions)
     functions = {
+      # Attach to the most recent zellij session, or create one if
+      # none exist. Functions (not aliases) so fish doesn't auto-append
+      # `$argv` to the body. `--reverse` puts the most recently created
+      # session first.
+      zj = "set -l sessions (zellij list-sessions --short --reverse 2>/dev/null); if set -q sessions[1]; zellij attach $sessions[1]; else; zellij attach --create; end";
+
       # Extract common archive types. The fallback case is
       # written with `printf` + fish string concat so filenames
       # with spaces or quotes work.

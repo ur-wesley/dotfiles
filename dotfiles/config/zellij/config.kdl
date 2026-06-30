@@ -5,6 +5,12 @@
 // Apply changes from WSL: ~/nix-config/dotfiles/update.sh
 // Theme: catppuccin-mocha (must be loaded from theme_dir).
 
+// Pane frame options. `pane_frames false` (at the top level) hides
+// the per-pane border entirely — fish shells get full-width output
+// with no decoration. The `ui.pane_frames.hide_session_name` option
+// below controls whether the session name shows in the title bar.
+pane_frames false
+
 ui {
     pane_frames {
         hide_session_name false
