@@ -32,8 +32,7 @@ vimcmd_symbol = "❮"
 vimcmd_visual_symbol = "❮"
 vimcmd_replace_symbol = "❮"
 vimcmd_replace_one_symbol = "❮"
-style = "bg:#cba6f7 fg:#1e1e2e bold"
-format = "[ $symbol ]($style) "
+format = "[ $symbol ](bg:#cba6f7 fg:#1e1e2e bold) "
 disabled = false
 
 # --- Username chip ---------------------------------------------
