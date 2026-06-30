@@ -14,7 +14,7 @@ files.
 
 ```powershell
 # Right-click PowerShell, "Run as Administrator"
-$f="$env:TEMP\install.ps1"; irm https://raw.githubusercontent.com/ur-wesley/dotfiles/main/install/install.ps1 -OutFile $f; (Get-Content $f -Raw) -replace "`n","`r`n" | Set-Content $f -NoNewline; & $f
+$f="$env:TEMP\install.ps1"; irm https://raw.githubusercontent.com/ur-wesley/dotfiles/main/install/install.ps1 -OutFile $f; [IO.File]::WriteAllText($f,(Get-Content $f -Raw).Replace("`n","`r`n")); & $f
 ```
 
 This installs winget packages (PowerShell 7, VS Code, dev CLIs, etc.),
@@ -28,7 +28,7 @@ JetBrainsMono Nerd Font, NixOS-WSL, and symlinks the dotfiles into
 ### Daily sync (Windows)
 
 ```powershell
-$f="$env:TEMP\sync.ps1"; irm https://raw.githubusercontent.com/ur-wesley/dotfiles/main/install/sync.ps1 -OutFile $f; (Get-Content $f -Raw) -replace "`n","`r`n" | Set-Content $f -NoNewline; & $f
+$f="$env:TEMP\sync.ps1"; irm https://raw.githubusercontent.com/ur-wesley/dotfiles/main/install/sync.ps1 -OutFile $f; [IO.File]::WriteAllText($f,(Get-Content $f -Raw).Replace("`n","`r`n")); & $f
 ```
 
 Pulls latest, re-symlinks on Windows, rebuilds NixOS in WSL.
@@ -232,7 +232,7 @@ cd ~/nix-config/dotfiles && make restow
 nrs
 
 # Or from Windows PowerShell
-$f="$env:TEMP\sync.ps1"; irm https://raw.githubusercontent.com/ur-wesley/dotfiles/main/install/sync.ps1 -OutFile $f; (Get-Content $f -Raw) -replace "`n","`r`n" | Set-Content $f -NoNewline; & $f
+$f="$env:TEMP\sync.ps1"; irm https://raw.githubusercontent.com/ur-wesley/dotfiles/main/install/sync.ps1 -OutFile $f; [IO.File]::WriteAllText($f,(Get-Content $f -Raw).Replace("`n","`r`n")); & $f
 ```
 
 ### Update inputs
