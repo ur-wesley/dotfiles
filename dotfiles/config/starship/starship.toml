@@ -1,9 +1,8 @@
-# Wesley's starship config — minimal, no background colors.
-# Layout: directory + character on left, every status module on right
-# via $all. Catppuccin Mocha colors used as text fg only (no bg fills).
+# Wesley's starship config — minimal, omerxx-style.
+# Layout: directory + character on left, everything else on right via $all.
+# No background colors — just Catppuccin Mocha accent colors as text fg.
 #
 # Apply changes from WSL: ~/nix-config/dotfiles/update.sh
-# Nerd Font recommended for the language module icons.
 
 "$schema" = "https://starship.rs/config-schema.json"
 add_newline = false
@@ -13,13 +12,13 @@ continuation_prompt = "[▸▸](bold blue)"
 
 palette = "catppuccin_mocha"
 
-# Minimal left: directory + plain green prompt character.
-# Right: $all — every other module rendered with fg color only.
+# Minimal left: directory + plain prompt character.
+# Right: $all — every other module with starship defaults.
 format = """$directory$character"""
 right_format = """$all"""
 
 # --- Prompt character ---------------------------------------------
-# Plain green text arrow (no chip).
+# Plain colored text arrow — no chip.
 [character]
 success_symbol = '[➜](bold green)'
 error_symbol = '[➜](bold red)'
@@ -28,91 +27,27 @@ vimcmd_replace_symbol = "[R]>>>"
 vimcmd_replace_one_symbol = "[r]>>>"
 vimcmd_visual_symbol = "[V]>>>"
 
-# --- Directory (left, first) --------------------------------------
-# Just fg color — text only, no chip background.
+# --- Directory ------------------------------------------------------
+# Blue fg only (no bg). Just the path with a leading space.
 [directory]
 style = "fg:blue bold"
-format = "[$path]($style)"
+format = " $path "
 truncation_length = 3
 truncation_symbol = "…/"
 home_symbol = "~"
 read_only = " 🔒"
 
-# --- Git branch -----------------------------------------------------
-# Yellow text — no bg.
+# --- Git branch + status (yellow fg only, starship default format) ---
 [git_branch]
 symbol = ""
-style = "fg:yellow bold"
-format = "[$symbol$branch(:$remote_branch) ]($style)"
+format = "[$symbol$branch]($style) "
 
-# --- Git status -----------------------------------------------------
-# Red text — no bg.
-[git_status]
-style = "fg:red bold"
-format = "[$all_status$ahead_behind ]($style)"
-modified = "!"
-staged = "+"
-renamed = "»"
-deleted = "✘"
-untracked = "?"
-ahead = "⇡${count}"
-behind = "⇣${count}"
-diverged = "⇕±${count}"
-
-# --- Language stack — each in its own fg color, no chip ----------
-[nodejs]
-symbol = "⬢ "
-style = "fg:green bold"
-format = "[$symbol$version ]($style)"
-
-[rust]
-symbol = "🦀 "
-style = "fg:peach bold"
-format = "[$symbol$version ]($style)"
-
-[python]
-symbol = " "
-style = "fg:yellow bold"
-format = "[$symbol$version ]($style)"
-
-[golang]
-symbol = " "
-style = "fg:teal bold"
-format = "[$symbol$version ]($style)"
-
-[java]
-symbol = "☕ "
-style = "fg:red bold"
-format = "[$symbol$version ]($style)"
-
-[kotlin]
-symbol = "🟪 "
-style = "fg:lavender bold"
-format = "[$symbol$version ]($style)"
-
-[ruby]
-symbol = "💎 "
-style = "fg:red bold"
-format = "[$symbol$version ]($style)"
-
-[php]
-symbol = "🐘 "
-style = "fg:lavender bold"
-format = "[$symbol$version ]($style)"
-
-# --- Time pill (rightmost) ---------------------------------------
-[time]
-disabled = false
-time_format = "%R"
-style = "fg:lavender bold"
-format = "[$time]($style)"
-
-# --- Disabled (minimal prompt) ----------------------------------
+# --- Disabled modules (no clutter on right) ----------------------
 [memory_usage]
 disabled = true
 
 # ============================================================================
-# Palette — Catppuccin Mocha. Referenced as fg:NAME / bg:NAME above.
+# Palette — Catppuccin Mocha.
 # ============================================================================
 [palettes.catppuccin_mocha]
 rosewater = "#f5e0dc"
