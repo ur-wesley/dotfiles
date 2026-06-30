@@ -1,29 +1,27 @@
 # Wesley's dev environment installer for new Windows machines.
 #
-# Single-file portable installer. Stow-driven dotfiles + NixOS-WSL.
+# Single-file portable installer. Symlink-driven dotfiles + NixOS-WSL.
 # Mirrors the omerxx/dotfiles structure: one tree, one install command.
 #
 # Usage (PowerShell, run as Administrator):
-#   iwr -useb https://raw.githubusercontent.com/<owner>/<repo>/main/install/install.ps1 | iex
+#   irm https://raw.githubusercontent.com/<owner>/<repo>/main/install/install.ps1 | iex
 #
 # Or, after downloading:
-#   .\install.ps1
+#   .\install.ps1   (edit the variables below to customize)
 #
 # Requirements: Windows 10/11, internet, ~30 GB free disk.
 
-[CmdletBinding()]
-param(
-    [string]$Repo = "ur-wesley/dotfiles",
-    [string]$Branch = "main",
-    [string]$NixConfigDir = "$HOME\nix-config",
-    [switch]$SkipNixOS = $false,
-    [switch]$SkipRepos = $false,
-    [switch]$SkipVSCode = $false,
-    [switch]$SkipFonts = $false,
-    [switch]$SkipStow = $false,
-    [switch]$SkipWinget = $false,
-    [switch]$Force = $false
-)
+& {
+$Repo         = "ur-wesley/dotfiles"
+$Branch       = "main"
+$NixConfigDir = "$HOME\nix-config"
+$SkipNixOS    = $false
+$SkipRepos    = $false
+$SkipVSCode   = $false
+$SkipFonts    = $false
+$SkipStow     = $false
+$SkipWinget   = $false
+$Force        = $false
 
 $ErrorActionPreference = "Stop"
 $ProgressPreference   = "SilentlyContinue"
@@ -135,21 +133,16 @@ if (-not $SkipWinget) {
     }
 }
 
-# ---- scoop + stow -----------------------------------------------------
-# Stow drives the dotfiles sync. Install via scoop so we have it on PATH.
-if (-not $SkipStow) {
-    Step "Installing GNU stow via scoop"
+# ---- scoop (for nerd-fonts) ------------------------------------------
+if (-not $SkipFonts) {
     if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
+        Step "Installing scoop"
         Write-Host "  -> Installing scoop..." -ForegroundColor DarkGray
         Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
         Invoke-RestMethod -Uri "https://get.scoop.sh" -UseBasicParsing | Invoke-Expression
     }
     if (Get-Command scoop -ErrorAction SilentlyContinue) {
         scoop bucket add nerd-fonts 2>&1 | Out-Null
-        scoop install stow 2>&1 | Out-Null
-        Ok "stow installed"
-    } else {
-        Warn "scoop not available; install stow manually: scoop install stow"
     }
 }
 
@@ -244,21 +237,41 @@ if (-not $SkipRepos) {
     }
 }
 
-# ---- Stow dotfiles ---------------------------------------------------
-# Stow drops config/home into $HOME on Windows. Inside WSL, the same
-# files are reached via the bind-mount of C:\Users\parac\nix-config
-# (symlinked to ~/nix-config), and home-manager uses `xdg.configFile.source`
-# to symlink ~/.config/<x> at Nix-store copies of the same files.
-if (-not $SkipStow -and (Test-Path "$NixConfigDir\dotfiles")) {
-    Step "Stowing dotfiles"
-    Push-Location "$NixConfigDir\dotfiles"
-    if (Get-Command stow -ErrorAction SilentlyContinue) {
-        stow --target=$HOME --restow config home
-        Ok "dotfiles stowed into $HOME"
-    } else {
-        Warn "stow not on PATH; skipping. Run: cd $NixConfigDir\dotfiles && stow --restow config home"
+# ---- Symlink dotfiles (native, no stow needed) ----------------------
+# Replaces GNU stow with native symlinks. Creates directory symlinks
+# in $HOME mirroring dotfiles/config/ → ~/.config/<name>/ and
+# dotfiles/home/ → ~/... . This is the Windows-native equivalent of
+# `stow --target=$HOME --restow config home`.
+function Invoke-DotfileSymlinks {
+    param([string]$Source, [string]$Target)
+    foreach ($item in Get-ChildItem -Path $Source) {
+        $link = Join-Path $Target $item.Name
+        if (Test-Path $link) {
+            $existing = Get-Item $link -Force
+            if ($existing.Attributes -band [IO.FileAttributes]::ReparsePoint) {
+                Remove-Item $link -Force
+            } else {
+                Warn "  $link exists and is not a symlink; skipping"
+                continue
+            }
+        }
+        New-Item -ItemType SymbolicLink -Path $link -Target $item.FullName | Out-Null
+        Ok "  $link -> $($item.FullName)"
     }
-    Pop-Location
+}
+
+if (-not $SkipStow -and (Test-Path "$NixConfigDir\dotfiles")) {
+    Step "Symlinking dotfiles into $HOME"
+
+    # dotfiles/config/* → ~/.config/<name>/
+    $configDir = Join-Path $HOME ".config"
+    if (-not (Test-Path $configDir)) { New-Item -ItemType Directory -Path $configDir | Out-Null }
+    Invoke-DotfileSymlinks -Source "$NixConfigDir\dotfiles\config" -Target $configDir
+
+    # dotfiles/home/* → ~/
+    Invoke-DotfileSymlinks -Source "$NixConfigDir\dotfiles\home" -Target $HOME
+
+    Ok "dotfiles symlinked into $HOME"
 }
 
 # ---- NixOS rebuild inside WSL ----------------------------------------
@@ -284,7 +297,8 @@ Write-Host "  2. From inside WSL, run 'zj' to start zellij (Catppuccin Mocha)" -
 Write-Host "  3. Press Ctrl+F to open television (fuzzy file finder)" -ForegroundColor Green
 Write-Host "  4. Press Ctrl+G to open navi (cheatsheets)" -ForegroundColor Green
 Write-Host ""
-Write-Host "  Daily sync: cd $NixConfigDir\dotfiles && stow --restow config home" -ForegroundColor DarkGray
+Write-Host "  Daily sync: re-run this script, or cd $NixConfigDir\dotfiles && make restow (inside WSL)" -ForegroundColor DarkGray
 Write-Host "  Inside WSL: cd ~/nix-config/dotfiles && make restow" -ForegroundColor DarkGray
 Write-Host ""
 Ok "All set. Welcome to the new box."
+} # end installer scriptblock
