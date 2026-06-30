@@ -74,11 +74,11 @@ $wingetPackages = @(
     # Runtime manager (node, python, go, rust, dotnet, bun, etc.)
     @{ id = "jdx.mise";                      name = "mise (runtime manager)" },
 
-    # Terminals — WezTerm (Catppuccin Mocha, blur) is the GPU-accelerated
+    # Terminals -- WezTerm (Catppuccin Mocha, blur) is the GPU-accelerated
     # alternative to Rio (Rust, simpler). Both share dotfiles/config/<x>/.
     @{ id = "wez.wezterm";                   name = "WezTerm (GPU terminal)" },
 
-    # Modern Unix CLI — fish-parity stack for PowerShell 7.
+    # Modern Unix CLI -- fish-parity stack for PowerShell 7.
     # See dotfiles/home/powershell/Microsoft.PowerShell_profile.ps1
     @{ id = "gerardog.gsudo";                name = "gsudo (sudo for Windows)" },
     @{ id = "BurntSushi.ripgrep.MSVC";        name = "ripgrep" },
@@ -228,8 +228,8 @@ if (-not $SkipRepos) {
 
 # ---- Symlink dotfiles (native, no stow needed) ----------------------
 # Replaces GNU stow with native symlinks. Creates directory symlinks
-# in $HOME mirroring dotfiles/config/ → ~/.config/<name>/ and
-# dotfiles/home/ → ~/... . This is the Windows-native equivalent of
+# in $HOME mirroring dotfiles/config/ -> ~/.config/<name>/ and
+# dotfiles/home/ -> ~/... . This is the Windows-native equivalent of
 # `stow --target=$HOME --restow config home`.
 function Invoke-DotfileSymlinks {
     param([string]$Source, [string]$Target)
@@ -252,12 +252,12 @@ function Invoke-DotfileSymlinks {
 if (-not $SkipStow -and (Test-Path "$NixConfigDir\dotfiles")) {
     Step "Symlinking dotfiles into $HOME"
 
-    # dotfiles/config/* → ~/.config/<name>/
+    # dotfiles/config/* -> ~/.config/<name>/
     $configDir = Join-Path $HOME ".config"
     if (-not (Test-Path $configDir)) { New-Item -ItemType Directory -Path $configDir | Out-Null }
     Invoke-DotfileSymlinks -Source "$NixConfigDir\dotfiles\config" -Target $configDir
 
-    # dotfiles/home/* → ~/
+    # dotfiles/home/* -> ~/
     Invoke-DotfileSymlinks -Source "$NixConfigDir\dotfiles\home" -Target $HOME
 
     Ok "dotfiles symlinked into $HOME"
@@ -281,7 +281,7 @@ if (-not $SkipNixOS -and -not $SkipRepos) {
 
 # ---- Done ------------------------------------------------------------
 Step "Done. Next steps:"
-Write-Host "  1. Open Windows Terminal — the NixOS profile drops you into fish in WSL" -ForegroundColor Green
+Write-Host "  1. Open Windows Terminal -- the NixOS profile drops you into fish in WSL" -ForegroundColor Green
 Write-Host "  2. From inside WSL, run 'zj' to start zellij (Catppuccin Mocha)" -ForegroundColor Green
 Write-Host "  3. Press Ctrl+F to open television (fuzzy file finder)" -ForegroundColor Green
 Write-Host "  4. Press Ctrl+G to open navi (cheatsheets)" -ForegroundColor Green

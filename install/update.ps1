@@ -1,4 +1,4 @@
-# Wesley's Windows-side dotfiles sync — pulls latest + restows.
+# Wesley's Windows-side dotfiles sync -- pulls latest + restows.
 #
 # Mirrors dotfiles/update.sh for Windows. Use this to apply Rio,
 # Windows Terminal, PowerShell profile changes from the repo to

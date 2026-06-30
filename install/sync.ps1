@@ -1,4 +1,4 @@
-# Wesley's config sync — symlink-driven dotfiles + NixOS rebuild.
+# Wesley's config sync -- symlink-driven dotfiles + NixOS rebuild.
 # Run from PowerShell (no admin needed). Will:
 #   1. git pull in the nix-config repo
 #   2. symlink dotfiles into $HOME (Windows-side)
