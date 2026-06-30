@@ -8,15 +8,15 @@ log-level = "DEBUG"
 enable-log-file = true
 
 # ---- Window ----------------------------------------------------------
-# Opacity 1.0 — fully opaque Catppuccin Mocha base (#1e1e2e). With opacity
-# below ~0.95 the desktop wallpaper bleeds through and washes the bg
-# out to a muddy lavender-grey. Set blur=true for a subtle frosted
-# effect on the title bar only; the terminal pane stays solid.
+# Opacity 0.88 + blur=true — frosted-glass Catppuccin Mocha. The terminal
+# pane stays 88% opaque (so colors stay readable) while 12% of the
+# desktop wallpaper shows through, blurred. On light wallpapers lower
+# this to ~0.85; on dark wallpapers 0.90 looks great.
 [window]
 width = 1280
 height = 820
-opacity = 1.0
-blur = false
+opacity = 0.88
+blur = true
 decorations = "Transparent"
 # Top padding leaves room for the tab strip when 2+ tabs are open.
 # Bottom/sides are 0 so the terminal uses the full window.
