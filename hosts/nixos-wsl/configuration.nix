@@ -120,6 +120,7 @@
   ####################
   services = {
     dbus.enable = true;
+    tailscale.enable = true;
   };
 
   ####################
