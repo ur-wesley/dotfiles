@@ -177,42 +177,35 @@ if (-not $SkipNixOS) {
         Ok "NixOS-WSL imported"
     }
 
-    # Set as default + apply wsl.conf
+    # Set as default + configure NixOS user
     wsl --set-default NixOS 2>&1 | Out-Null
-    $wslPath = wsl -d NixOS -u root -- wslpath ($NixConfigDir.Replace('\', '/'))
-    $wslPath = $wslPath.Trim()
-    wsl -d NixOS -u root -- bash -c "
+    $env:WSL_REPO_PATH = $NixConfigDir
+    $env:WSLENV = 'WSL_REPO_PATH/p'
+    wsl -d NixOS -u root -- bash -c @'
 set -euo pipefail
-# wsl.conf
-cat > /etc/wsl.conf <<'EOF'
-[boot]
-systemd=true
-[user]
-default=wesley
-[interop]
-enabled=true
-appendWindowsPath=false
-[automount]
-enabled=true
-options=metadata,umask=22,fmask=11
-mountFsTab=true
-[network]
-generateHosts=true
-generateResolvConf=true
-EOF
 
-# Create user
-if ! id -u wesley >/dev/null 2>&1; then
-    useradd -m -G wheel -s /bin/bash wesley
+# Remove default nixos user to free up UID 1000
+if id -u nixos >/dev/null 2>&1; then
+    userdel -r nixos 2>/dev/null || true
 fi
-echo 'wesley ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/wheel-nopasswd
-chmod 0440 /etc/sudoers.d/wheel-nopasswd
+
+# Create user with UID 1000
+if ! id -u wesley >/dev/null 2>&1; then
+    useradd -u 1000 -m -G wheel -s /bin/bash wesley
+else
+    if [ "$(id -u wesley)" -ne 1000 ]; then
+        usermod -u 1000 wesley
+        chown -R 1000:100 /home/wesley
+    fi
+fi
 
 # Symlink nix-config repo inside WSL
 rm -f /home/wesley/nix-config
-ln -s '$wslPath' /home/wesley/nix-config
+ln -s "$WSL_REPO_PATH" /home/wesley/nix-config
 chown -h wesley:users /home/wesley/nix-config
-"
+'@
+    Remove-Item Env:\WSL_REPO_PATH
+    Remove-Item Env:\WSLENV
     Ok "NixOS-WSL configured"
 }
 
