@@ -11,6 +11,7 @@
         cursorline = true;
         color-modes = true;
         true-color = true;
+        background = "default";
         bufferline = "multiple";
         scrolloff = 8;
         cursor-shape = {
