@@ -13,7 +13,6 @@
         true-color = true;
         bufferline = "multiple";
         scrolloff = 8;
-        sidescrolloff = 16;
         cursor-shape = {
           insert = "bar";
           normal = "block";
