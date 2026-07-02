@@ -138,8 +138,8 @@
 
   ####################
   # WSL workaround: doas needs the setuid bit, but the Nix store
-  # is on a separate ext4 partition that's remounted read-only
-  # during activation. A systemd oneshot service fixes it on boot.
+  # is on a separate ext4 partition that's mounted read-only.
+  # A systemd oneshot service remounts rw, sets the bit, remounts ro.
   ####################
   systemd.services.doas-setuid = {
     description = "Set doas setuid bit (WSL workaround)";
@@ -149,11 +149,13 @@
       Type = "oneshot";
       RemainAfterExit = true;
       ExecStart = pkgs.writeShellScript "doas-setuid" ''
-        for doas_path in /nix/store/*-doas*/bin/doas; do
-          if [ -f "$doas_path" ] && [ ! -u "$doas_path" ]; then
-            ${pkgs.coreutils}/bin/chmod 4755 "$doas_path"
+        ${pkgs.util-linux}/bin/mount -o remount,rw /nix/store || true
+        for d in /nix/store/*-doas*/bin/doas; do
+          if [ -f "$d" ] && [ ! -u "$d" ]; then
+            ${pkgs.coreutils}/bin/chmod 4755 "$d"
           fi
         done
+        ${pkgs.util-linux}/bin/mount -o remount,ro /nix/store || true
       '';
     };
   };
