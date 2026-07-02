@@ -244,7 +244,9 @@
     # loginShellInit for login shell specific stuff
     loginShellInit = ''
       # Ensure PATH is set up properly for SSH sessions
-      fish_add_path -p /run/current-system/sw/bin
+      if not contains /run/current-system/sw/bin $PATH
+        set -gx PATH $PATH /run/current-system/sw/bin
+      end
 
       # Force truecolor terminal so starship + zellij can emit
       # 24-bit RGB colors. Without this, colors get downgraded to
