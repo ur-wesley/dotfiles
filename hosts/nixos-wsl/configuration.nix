@@ -137,9 +137,21 @@
   };
 
   ####################
-  # WSL note: doas is used instead of sudo to avoid setuid issues
-  # with the Nix store on a separate ext4 partition.
+  # WSL workaround: doas needs the setuid bit, but the Nix store
+  # is on a separate ext4 partition that's remounted read-only
+  # during activation. Fix it after the store is writable.
   ####################
+  system.activationScripts.doasSetuid = {
+    text = ''
+      ${pkgs.bash}/bin/bash -c '
+        for doas_path in /nix/store/*-doas*/bin/doas; do
+          if [ -f "$doas_path" ] && [ ! -u "$doas_path" ]; then
+            /nix/store/*-coreutils*/bin/chmod 4755 "$doas_path" 2>/dev/null || true
+          fi
+        done
+      '
+    '';
+  };
 
   ####################
   # System state version
