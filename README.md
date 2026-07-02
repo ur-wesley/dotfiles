@@ -22,7 +22,7 @@ JetBrainsMono Nerd Font, NixOS-WSL, and symlinks the dotfiles into
 `$HOME` (native PowerShell symlinks, no stow needed on Windows). After it finishes:
 
 1. Open Windows Terminal — the NixOS profile drops you into fish in WSL.
-2. Inside the WSL shell, run `nrs` (alias for `sudo nixos-rebuild switch`).
+2. Inside the WSL shell, run `nrs` (alias for `doas nixos-rebuild switch`).
 3. Done. Zellij + television + navi + fish + starship all live.
 
 ### Daily sync (Windows)
@@ -158,7 +158,7 @@ Rounded parens `(…)`, soft `·` separator dots, each module in a distinct Catp
 | `code`, `code-wsl` → VS Code (local + WSL) |
 | `cc` → `claude`; `oc` → `opencode`; `gentle` → `gentle-ai`; `tv` → `television` |
 | `zj` → `zellij attach --create` |
-| `nrs` | `sudo nixos-rebuild switch` |
+| `nrs` | `doas nixos-rebuild switch` |
 | `hms` | `home-manager switch --flake .` |
 | `nfu` | `nix flake update` + `nrs` |
 | `rm` → `trash-put` (recoverable) |
@@ -212,7 +212,7 @@ LSP servers: `ts_ls`, `pyright`, `rust_analyzer`, `gopls`, `clangd`, `jdtls`, `l
 ## What this gives you
 
 - **NixOS 26.05 (Yarara)** running inside WSL2 as the default distro, fully Nix-managed. Hostname: `Dev`.
-- **`wesley`** is the default user. Passwordless `sudo` via `wheel`.
+- **`wesley`** is the default user. Passwordless `doas` via `wheel`.
 - **Home Manager** manages ~everything userland: shell, editor, terminal config, tools, dotfiles, git, gh, etc.
 - **fish** default shell, with **starship** prompt, **zoxide** `cd`, **direnv** + **nix-direnv**, **atuin** + **mcfly** history, **fzf** keybindings.
 - **Nixvim** primary editor (30+ plugins, full LSP for every language, mini.clue hotkey help).
@@ -244,18 +244,8 @@ nfu           # alias: nix flake update + nixos-rebuild + home-manager
 ### Roll back
 
 ```fish
-sudo nixos-rebuild --rollback switch
+doas nixos-rebuild --rollback switch
 ```
-
-### WSL sudo setuid workaround (READ THIS)
-
-The Nix store is on a separate ext4 partition that's remounted read-only during rebuilds. The setuid bit on `sudo` is lost after every rebuild. **After each rebuild, run as `root`**:
-
-```bash
-sudo chmod 4755 /nix/store/*-sudo-rs*/bin/sudo
-```
-
-As `wesley` this fails (the store path is owned by root and read-only after the rebuild remount). Run via `wsl -u root -- nix-config` or re-enter with `sudo -i` first.
 
 ### Add a new tool
 
@@ -272,7 +262,7 @@ Then `nrs`.
 
 ### Add a new system package
 
-Edit `hosts/nixos-wsl/configuration.nix` and add to `environment.systemPackages`. For things that need to be available system-wide (currently kept minimal — vim, git, sudo, etc.).
+Edit `hosts/nixos-wsl/configuration.nix` and add to `environment.systemPackages`. For things that need to be available system-wide (currently kept minimal — vim, git, etc.).
 
 ### Add a new dotfiles package
 

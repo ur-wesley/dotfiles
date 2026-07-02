@@ -156,12 +156,12 @@
       mv = "mv -i";
 
       # Nix
-      nrs = "sudo nixos-rebuild switch --flake ~/nix-config#nixos-wsl";
-      nrt = "sudo nixos-rebuild test --flake ~/nix-config#nixos-wsl";
-      nrb = "sudo nixos-rebuild boot --flake ~/nix-config#nixos-wsl";
-      nrf = "sudo nixos-rebuild switch --flake ~/nix-config#nixos-wsl --refresh";
+      nrs = "doas nixos-rebuild switch --flake ~/nix-config#nixos-wsl";
+      nrt = "doas nixos-rebuild test --flake ~/nix-config#nixos-wsl";
+      nrb = "doas nixos-rebuild boot --flake ~/nix-config#nixos-wsl";
+      nrf = "doas nixos-rebuild switch --flake ~/nix-config#nixos-wsl --refresh";
       hms = "home-manager switch --flake ~/nix-config#wesley@nixos-wsl";
-      nfu = "nix flake update ~/nix-config && sudo nixos-rebuild switch --flake ~/nix-config#nixos-wsl && home-manager switch --flake ~/nix-config#wesley@nixos-wsl";
+      nfu = "nix flake update ~/nix-config && doas nixos-rebuild switch --flake ~/nix-config#nixos-wsl && home-manager switch --flake ~/nix-config#wesley@nixos-wsl";
       ncl = "nix-collect-garbage -d";
     };
 
@@ -252,14 +252,6 @@
       # washed out.
       set -gx TERM alacritty
       set -gx COLORTERM truecolor
-
-      # WSL workaround: nix store is on a separate ext4 partition
-      # that loses the setuid bit on every rebuild. Fix it on login.
-      for sudo_path in /nix/store/*-sudo*/bin/sudo /nix/store/*-sudo-rs*/bin/sudo
-        if test -f "$sudo_path"; and not test -u "$sudo_path"
-          sudo -n true 2>/dev/null; or command sudo -n chmod 4755 "$sudo_path" 2>/dev/null
-        end
-      end
 
       # Note: zellij auto-launch was removed. The `zj` function
       # (defined in functions) handles explicit attach to the

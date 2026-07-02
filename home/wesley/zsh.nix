@@ -74,12 +74,12 @@
       mv = "mv -i";
 
       # Nix
-      nrs = "sudo nixos-rebuild switch --flake ~/nix-config#nixos-wsl";
-      nrt = "sudo nixos-rebuild test --flake ~/nix-config#nixos-wsl";
-      nrb = "sudo nixos-rebuild boot --flake ~/nix-config#nixos-wsl";
-      nrf = "sudo nixos-rebuild switch --flake ~/nix-config#nixos-wsl --refresh";
+      nrs = "doas nixos-rebuild switch --flake ~/nix-config#nixos-wsl";
+      nrt = "doas nixos-rebuild test --flake ~/nix-config#nixos-wsl";
+      nrb = "doas nixos-rebuild boot --flake ~/nix-config#nixos-wsl";
+      nrf = "doas nixos-rebuild switch --flake ~/nix-config#nixos-wsl --refresh";
       hms = "home-manager switch --flake ~/nix-config#wesley@nixos-wsl";
-      nfu = "nix flake update ~/nix-config && sudo nixos-rebuild switch --flake ~/nix-config#nixos-wsl && home-manager switch --flake ~/nix-config#wesley@nixos-wsl";
+      nfu = "nix flake update ~/nix-config && doas nixos-rebuild switch --flake ~/nix-config#nixos-wsl && home-manager switch --flake ~/nix-config#wesley@nixos-wsl";
       ncl = "nix-collect-garbage -d";
     };
 

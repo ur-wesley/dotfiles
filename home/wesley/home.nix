@@ -9,6 +9,7 @@
     ./cli-tools.nix
     ./dev-tools.nix
     ./nvim.nix
+    ./helix.nix
     ./wezterm.nix
   ];
 

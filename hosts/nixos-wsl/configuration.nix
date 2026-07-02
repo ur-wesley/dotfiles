@@ -108,11 +108,14 @@
   ];
 
   ####################
-  # Security: allow sudo without password for wheel
+  # Security: passwordless doas for wheel group
   ####################
-  security.sudo-rs = {
+  security.doas = {
     enable = true;
-    wheelNeedsPassword = false;
+    extraRules = [{
+      groups = [ "wheel" ];
+      noPass = true;
+    }];
   };
 
   ####################
@@ -134,14 +137,8 @@
   };
 
   ####################
-  # WSL-specific: setuid bit on sudo is lost on every rebuild because
-  # the nix store is on a separate ext4 partition that's remounted ro
-  # during activation. Run this once after each rebuild:
-  #
-  #   sudo chmod 4755 /nix/store/*-sudo-rs*/bin/sudo
-  #
-  # (The activation script can't fix this — it runs while the nix
-  # store is read-only.)
+  # WSL note: doas is used instead of sudo to avoid setuid issues
+  # with the Nix store on a separate ext4 partition.
   ####################
 
   ####################
