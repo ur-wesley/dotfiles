@@ -28,6 +28,26 @@ plugins {
     compact-bar { path "compact-bar"; }
 }
 
+status-bar {
+    mode {
+        current_mode_text "#pistachio> #text#"
+        normal_mode_text "NOR"
+        pane_mode_text "PNE"
+        tab_mode_text "TAB"
+        resize_mode_text "RSZ"
+        move_mode_text "MOV"
+        scroll_mode_text "SCR"
+        search_mode_text "SRH"
+        locked_mode_text "LCK"
+        enter_search_mode_text "ENT"
+        rename_tab_mode_text "RNT"
+        rename_pane_mode_text "RNP"
+        session_mode_text "SES"
+        tmux_mode_text "TMX"
+        enabled_modal true
+    }
+}
+
 // Full custom keybindings — omerxx's tmux-style setup.
 // Ctrl+A is the leader key (like tmux).
 keybinds clear-defaults=true {
