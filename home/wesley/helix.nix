@@ -1,17 +1,19 @@
 { config, pkgs, ... }:
 
+let
+  configDir = ../../dotfiles;
+in
 {
   programs.helix = {
     enable = true;
     defaultEditor = false; # nvim is primary
     settings = {
-      theme = "catppuccin_mocha";
+      theme = "catppuccin_mocha_transparent";
       editor = {
         line-number = "relative";
         cursorline = true;
         color-modes = true;
         true-color = true;
-        background = "default";
         bufferline = "multiple";
         scrolloff = 8;
         cursor-shape = {
@@ -38,4 +40,7 @@
       };
     };
   };
+
+  xdg.configFile."helix/themes/catppuccin_mocha_transparent.toml".source =
+    "${configDir}/config/helix/themes/catppuccin_mocha_transparent.toml";
 }
